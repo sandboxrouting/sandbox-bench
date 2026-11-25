@@ -12,9 +12,9 @@ How providers, contributors and maintainers work together on sandbox-bench.
 
 | Division | Rules | Purpose |
 |---|---|---|
-| `default` | Public SDK at a pinned version, the standard sandbox spec, a publicly available plan, documented defaults | The headline, like-for-like view |
-| `optimized` | Any generally available feature or plan (warm pools, bigger tiers…), with the configuration disclosed | A provider's best case |
-| `submitted` | Results a provider or community member ran on their own account with the official harness (see below) | Tracks that are too expensive for us to run ourselves |
+| `default` | Public SDK at a pinned version, the standard sandbox spec, a publicly available plan. Any public mechanism is allowed **as long as it adds no standing cost**, e.g. a provider's built-in pre-started pool or memory restore. | The headline, like-for-like view |
+| `optimized` | Anything generally available, including features billed while idle (dedicated warm pools, reserved capacity, bigger tiers), with the configuration and idle cost disclosed | A provider's best case |
+| `submitted` | Results a provider or community member ran on their own account with the official harness (see below) | Boards that are too expensive for us to run ourselves |
 
 Beta features are tagged `preview` and kept out of `default`.
 
@@ -33,14 +33,14 @@ Beta features are tagged `preview` and kept out of `default`.
 
 ## Working with providers
 
-- **Heads-up before big releases.** Affected providers get a 7-day preview before a new track or a methodology version ships.
+- **Heads-up before big releases.** Affected providers get a 7-day preview before a new suite version or a methodology version ships.
 - **Provider notes.** Each provider page has room for a short statement from the provider.
 - **Issues.** If something looks off, open an issue with the `dispute` template and we'll work it out in public.
 - **Reproducibility.** If results can't be reproduced, we annotate them and may pull them until they can.
 
 ## Submitted results *(planned)*
 
-Some tracks cost more than free tiers and donated credits cover, such as GPU fleets, 1,000-sandbox bursts and long soak tests. For those, providers and community members can run the benchmark on their own accounts. This is an early design:
+Some boards cost more than free tiers and donated credits cover, such as GPU fleets, 1,000-sandbox bursts and long soak tests. For those, providers and community members can run the benchmark on their own accounts. This is an early design:
 
 - Run a tagged harness release with unmodified benchmarks and the public adapter.
 - Package the results with `sbx submit`. This bundles the manifest, raw samples and logs.
@@ -58,8 +58,8 @@ You're welcome to quote results. Please include:
 
 ## Changing the benchmark
 
-- **New benchmark in an existing track:** a PR with a short design note, and approval from one maintainer.
-- **New tracks, scoring changes and timing-boundary changes:** an RFC in `docs/rfcs/`, open for 14 days.
+- **New probe or board in an existing category:** a PR with a short design note, and approval from one maintainer. New probes ship in the next suite version.
+- **New categories, scoring changes and timing-boundary changes:** an RFC in `docs/rfcs/`, open for 14 days.
 - **Every accepted change** goes in `CHANGELOG.md`.
 
 ## Terms of service

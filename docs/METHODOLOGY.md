@@ -2,144 +2,181 @@
 
 > Status: **draft for v0.1**. This document is versioned together with the harness. If they disagree, the code wins, and the disagreement is a bug that someone should file.
 
-## 1. Units and vocabulary
+## 1. How the benchmark works
+
+sandbox-bench produces two kinds of results.
+
+1. **The probe suite: what a sandbox can do.**
+   - The suite is a fixed, versioned set of **probes**. Each probe is a pass/fail challenge, such as "fork keeps memory" or "egress block is enforced", and an automated **verifier** decides the outcome.
+   - A configuration's **probe score** is its pass rate. The main leaderboard is ranked by it.
+2. **Performance boards: how fast and how cheap.**
+   - These are numeric leaderboards for start time, resume, fork, file I/O, cost and so on.
+   - **A configuration appears on a board only if it passes that board's gating probe.** For example, you can't rank on fork speed without a fork that works.
+
+Each provider's extras turn into probes. A feature only one provider has today still earns that provider points. Once others support it, it also becomes a speed race.
+
+## 2. Vocabulary
 
 | Term | Definition |
 |---|---|
 | **Provider** | A company or product, e.g. E2B or Daytona. |
-| **Configuration** | **The unit we rank.** It is a provider, sandbox type, plan, region and size, e.g. `daytona/container/tier1/us/2c4g`. Daytona containers and Daytona Linux VMs are different products with different features, so they are separate configurations. |
-| **Track** | A family of related benchmarks with its own leaderboard, e.g. `lifecycle`, `state`, `workloads`, `scale`, `gpu`, `browser`, `cost`, `capabilities`. |
-| **Benchmark** | One measured scenario inside a track, e.g. `state/pause-resume`. It declares the capabilities it requires. |
-| **Metric** | One number a benchmark produces, e.g. `resume_ready_ms` or `memory_preserved`. |
-| **Sample** | One measurement of one metric in one iteration. |
-| **Run** | One execution of a set of benchmarks against a set of configurations. It has a `run_id` and a manifest. |
-| **Division** | `default` (stock SDK, documented defaults, publicly available plan), `optimized` (any documented feature or plan, disclosed) or `submitted` (run on someone else's account, see [GOVERNANCE](GOVERNANCE.md#submitted-results-planned)). Divisions are never mixed in one ranking. |
-| **Harness version** | A semver tag of this repo. A **major** bump means numbers are not comparable across versions. |
+| **Configuration** | **The unit we rank:** provider + sandbox type + plan + region + size, e.g. `daytona/container/tier1/us/2c4g`. Daytona containers and Daytona Linux VMs are different products, so they are separate configurations. |
+| **Probe** | A pass/fail challenge. It has a setup, an action and a verifier, and it lives in `probes/<category>/<name>/`. |
+| **Verifier** | The automated check that decides a probe's outcome, e.g. "same PID alive, same memory hash, counter continued". |
+| **Suite** | A versioned set of probes, e.g. `core-v0.1`. Probe scores are only compared within the same suite version. |
+| **Category** | A group of probes: `lifecycle`, `state`, `environment` and, later, `specialized`. |
+| **Metric** | A number measured on a performance board, e.g. `resume_ms`. |
+| **Board** | A leaderboard for one or more metrics. Each board is gated by one probe. |
+| **Start mode** | How a sandbox came up: `cold` (fresh boot) or `warm` (pre-started pool or memory restore). The harness detects it and shows it as a column. |
+| **Division** | `default`, `optimized` or `submitted` ([GOVERNANCE](GOVERNANCE.md#divisions)). Divisions are never mixed in one ranking. |
+| **Sample / Run** | A sample is one measurement. A run is one execution of the suite and boards, with a `run_id` and a manifest. |
 
-## 2. Standard sandbox spec
+## 3. Sandbox spec
 
-These settings keep comparisons like for like.
-
-- **Size:** 2 vCPU / 4 GiB RAM / ≥10 GiB disk. Where a provider has fixed shapes, we use the nearest shape at or above it and record the actual shape. Example: Cloudflare `standard-3` is 2 vCPU / 8 GiB. A provider joins the benchmark once its account (free tier or donated credits) can run this size. We don't measure undersized configurations.
-- **Images:** two modes, each reported separately.
-  - `default-image`: the provider's default or base image. This is what a new user experiences first.
-  - `standard-image`: our public image `sandbox-bench/base:<version>`, built from a Dockerfile in this repo (Debian slim, Python 3.12, Node 22, git, build-essential). Each provider registers it as a template or snapshot ahead of time. Template build time is measured separately and excluded from start metrics.
+- **Size:** 2 vCPU / 4 GiB RAM / ≥10 GiB disk.
+  - Where a provider has fixed shapes, we use the nearest shape at or above this and record the actual shape.
+  - A provider joins once its account (free tier or donated credits) can run this size.
+- **Environment:** there are two settings, and both are measured.
+  - **Default environment:** whatever the provider gives you without configuration. It is used by most probes and boards.
+  - **Pinned toolset:** our reference software set, defined in `toolset/v1.yaml`: Python 3.12, Node 22, git, gcc and make, at pinned versions. Each provider installs it with **its own native mechanism**, such as a Dockerfile build, a template, or a setup script followed by a snapshot. A verifier confirms the versions. We provide `toolset/Dockerfile` and `toolset/setup.sh` as reference implementations. The point is that "same software" is checked, not assumed, without forcing one image format on providers that can't accept it.
 - **Region:** the provider region closest to the runner, recorded per sample.
-- **Network:** default egress settings.
+- **Bring your own tools:** anything a verifier or workload needs is uploaded before the clock starts, as the `sbx-helper` binary or a pinned binary. Results therefore never depend on what a default image happens to contain.
 
-## 3. Timing boundaries (the glossary that makes numbers comparable)
+## 4. Probe suite: `core-v0.1`
 
-All timings are **client-side wall clock** taken with a monotonic clock (`time.perf_counter_ns`) in the harness, never from timings the provider reports. "Ready" always means **a command ran successfully inside the sandbox**, not "the API returned an ID".
-
-| Metric | Clock starts | Clock stops |
+| Category | Probe | Passes when |
 |---|---|---|
-| `create_ready_ms` (TTI) | Just before the SDK create call | The first `echo ready` exec returns exit code 0 with stdout `ready` |
-| `exec_rtt_ms` | Before the exec call | Exec returns. We take the median of 20 sequential `true` execs on a ready sandbox. |
-| `destroy_ms` | Before the destroy/kill call | The call returns successfully |
-| `snapshot_ms` | Before the snapshot call | The snapshot is usable (ID returned and the status is ready where the SDK exposes status) |
-| `restore_ready_ms` | Before the create-from-snapshot call | The first successful exec in the restored sandbox |
-| `pause_ms` | Before the pause/suspend call | The call returns or the state becomes paused |
-| `resume_ready_ms` | Before the resume call | The first successful exec in the resumed sandbox |
-| `fork_ready_ms` | Before the fork/branch call | The first successful exec in the child, or in **all** N children for fan-out |
-| `api_rtt_ms` | Before an HTTPS HEAD to the provider's API endpoint | Response received. This is network context only and is never subtracted. |
+| **lifecycle** | `create-exec` | A new 2c4g sandbox runs a command and returns the expected output |
+| | `file-roundtrip` | A 10 MiB random file is written, then read back with a matching SHA-256 |
+| | `toolset` | A sandbox started from the provider's pinned-toolset environment reports the exact versions in `toolset/v1.yaml` |
+| | `session-1h` | A sandbox is still alive and responsive after 1 hour. This probe runs weekly. |
+| **state** | `snapshot-keeps-files` | After snapshot and restore, a 64 MiB file has the same hash |
+| | `snapshot-keeps-memory` | After snapshot and restore, the helper process is alive with the same PID and memory hash, and its counter continued |
+| | `pause-keeps-files` | After pause and resume, the file hash matches |
+| | `pause-keeps-memory` | After pause and resume, the helper process is alive with the same PID and memory hash, and its counter continued |
+| | `fork-keeps-memory` | A fork of a running sandbox contains the parent's live helper process and memory state |
+| | `fork-isolation-x10` | 10 forks are all up. A marker written in one fork is invisible to the parent and the other forks. |
+| **environment** | `dockerfile` | The provider builds and starts a sandbox directly from `toolset/Dockerfile` |
+| | `internet` | A pinned file downloads from a public CDN with a matching hash |
+| | `egress-block` | With deny-all egress configured, an outbound connection fails |
+| | `exposed-port` | An HTTP server inside the sandbox is reachable from the runner through the provider's URL or port |
+| | `docker-in-sandbox` | `docker run` of a pinned image succeeds inside the sandbox |
 
-**Correctness metrics** for state operations. A fast operation that loses state does not count as success.
+**Outcomes:**
+- **pass (✓).**
+- **fail (✗):** the probe was attempted and the verifier rejected the result, or an error occurred.
+- **unsupported (—):** the adapter declares that the feature doesn't exist.
 
-| Metric | How it is verified |
+Both fail and unsupported score 0. They are shown differently so readers can tell a broken feature from a missing one.
+
+**Any public mechanism counts.** For example, a fork built from a memory snapshot plus N restores passes `fork-keeps-memory` if the verifier is satisfied. The mechanism is recorded in the configuration metadata.
+
+**Pass rule:** in the rolling 7-day window, a probe counts as passed when **≥ 90% of its attempts succeed**. Each cell shows the success rate, so flaky features are visible.
+
+**Probe score:**
+- The score is the **mean of the per-category pass rates**, so each category carries equal weight however many probes it has.
+- The raw count is shown next to it, e.g. "86% · 13/15".
+
+**Next categories** (each a suite minor version):
+- `specialized`: `chromium-cdp`, `desktop-screenshot`, `gpu-matmul`, `arm64`, `macos`, `windows`.
+- Further `state` probes: `idle-autowake`, `resume-after-24h`.
+
+## 5. Performance boards
+
+All timings are **client-side wall clock** taken with a monotonic clock in the harness, never from timings the provider reports. "Ready" always means **a command ran successfully inside the sandbox**, not "the API returned an ID".
+
+| Board | Metric | Clock starts | Clock stops | Gated by |
+|---|---|---|---|---|
+| **Start** | `start_ms` | Before the create call (default environment) | The first `echo ready` returns exit code 0 | `create-exec` |
+| **Start with toolset** | `start_toolset_ms` | Before the create call (pinned-toolset environment) | The first successful exec | `toolset` |
+| | `toolset_setup_s` (one-time) | Before building or registering the environment | It is usable | `toolset` |
+| **Exec round-trip** | `exec_rtt_ms` | Before the exec call | It returns. This is the median of 20 sequential `true` execs. | `create-exec` |
+| **File I/O** | `file_write_mbps`, `file_read_mbps` | Before the 10 MiB write or read | It completes | `file-roundtrip` |
+| **Snapshot & restore** | `snapshot_ms` | Before the snapshot call | The snapshot is usable | `snapshot-keeps-files` |
+| | `restore_ms` | Before create-from-snapshot | The first successful exec | `snapshot-keeps-files` |
+| **Pause & resume** | `pause_ms` | Before the pause call | The call returns or the state reads paused | `pause-keeps-files` |
+| | `resume_ms` | Before the resume call | The first successful exec | `pause-keeps-files` |
+| **Fork** | `fork_ms` | Before the fork call | The first successful exec in the child | `fork-isolation-x10` |
+| | `fork10_ms` | Before the fork call with N = 10 | All 10 children have run a command | `fork-isolation-x10` |
+| **Cost** | `usd_per_hour_full`, `usd_per_hour_idle` | List-price model (§9) | — | `create-exec` |
+
+**Extra columns:**
+- **Memory column.** Every state board shows whether the matching `*-keeps-memory` probe passes, and a "memory kept only" filter re-ranks the board. This keeps a fast files-only resume from being mistaken for a full one.
+- **Start mode.** At the first exec, the helper reads the age of PID 1.
+  - If PID 1 is younger than the time since the create call, the start is `cold`. Otherwise it is `warm`.
+  - The adapter declares whether a warm start means `pool` or `restore`.
+  - If the detected mode doesn't match the declared one, the result is flagged.
+
+**Later boards:** `workloads` (repo clone/install/test, CPU, disk, network, Terminal-Bench via Harbor), `scale` (burst N = 10/50/100 and sustained creates per minute; success rate is reported as capacity, separate from latency), `gpu`, and `browser`.
+
+## 6. The helper
+
+`sbx-helper` is a small static binary (Go, linux amd64/arm64) built from `helper/` in this repo. The harness uploads it before the clock starts. Because verifiers never rely on Python or any other software in the image, they work on any image.
+
+| Subcommand | Used by |
 |---|---|
-| `fs_preserved` | Before the operation, write a 64 MiB random file plus its SHA-256. Afterwards, re-hash it. |
-| `memory_preserved` | Before the operation, start a background process holding a 256 MiB random buffer and a monotonic counter, and record its PID and buffer hash. Afterwards, the same PID must be alive, report the same hash, and its counter must continue from where it was. |
-| `process_preserved` | The PID from the step above is still running. |
-| `fork_isolation` | Child A writes a marker. The parent and child B must not see it. |
+| `hold`: allocates a 256 MiB random buffer and keeps a monotonic counter running in the background | `*-keeps-memory` |
+| `inspect`: reports PID, buffer hash and counter | `*-keeps-memory`, `fork-keeps-memory` |
+| `mark` / `check`: writes and looks for isolation markers | `fork-isolation-x10` |
+| `toolset-check`: compares installed versions against `toolset/v1.yaml` | `toolset`, `dockerfile` |
+| `start-age`: reports the age of PID 1 | start-mode detection |
 
-Each state benchmark reports latency **and** correctness. Latency counts toward a ranking only when the correctness check passes.
+## 7. Measurement protocol
 
-## 4. Benchmark catalog
-
-The **v0.1** column marks the launch scope. Everything else is on the [roadmap](ROADMAP.md).
-
-### Track `lifecycle`
-| Benchmark | Metrics | v0.1 |
-|---|---|---|
-| `lifecycle/cold-start` | `create_ready_ms` (default-image and standard-image), `destroy_ms` | ✅ |
-| `lifecycle/exec-latency` | `exec_rtt_ms`, plus `file_write_ms` and `file_read_ms` for 1 KiB and 10 MiB | ✅ |
-| `lifecycle/template-build` | Time to register the standard image as a template | — |
-
-### Track `state` (our headline differentiator)
-| Benchmark | Metrics | v0.1 |
-|---|---|---|
-| `state/snapshot-restore` | `snapshot_ms`, `restore_ready_ms`, `fs_preserved`, `memory_preserved` | ✅ |
-| `state/pause-resume` | `pause_ms`, `resume_ready_ms`, `fs_preserved`, `memory_preserved`, `process_preserved` | ✅ |
-| `state/fork` | `fork_ready_ms` at fan-out 1 and 10, `memory_preserved`, `fork_isolation` | ✅ |
-| `state/idle-autowake` | Time for a scale-to-zero sandbox to wake on request | — |
-
-### Track `workloads` (real work inside the sandbox)
-| Benchmark | Metrics |
-|---|---|
-| `workloads/repo-test` | Clone a pinned mid-size repo, install dependencies, run its test suite. Reports wall time and success. |
-| `workloads/cpu` | A pinned compile job (e.g. building a fixed SQLite amalgamation) |
-| `workloads/disk-io` | `fio` sequential and random read/write and a SQLite insert/query benchmark |
-| `workloads/network` | Download throughput from a neutral CDN, and pip/npm install time |
-| `workloads/terminal-bench` | **Harbor + Terminal-Bench 2.x oracle agent** at fixed concurrency. Reports pass rate, wall clock, environment-error rate, and cost per 100 tasks. Because the oracle solutions are correct, every failure is the sandbox's fault. |
-
-### Track `scale`
-| Benchmark | Metrics |
-|---|---|
-| `scale/burst` | N ∈ {10, 50, 100} concurrent creates. Reports success rate, `create_ready_ms` distribution, and rate-limit errors. **This is reported as capacity, never folded into latency rankings.** |
-| `scale/sustained` | Creates per minute sustained for 10 minutes, and error rate |
-
-### Track `capabilities` (the verified feature matrix)
-Each capability is an executable **probe** with an outcome of `verified`, `claimed-but-failed`, `not-claimed` or `untested`. A `verified` badge needs the probe to pass in each of the last 3 runs.
-
-Probes: custom OCI image · outbound internet · egress allowlist enforced · exposed port / preview URL · filesystem snapshot · memory snapshot · pause/resume · live fork · GPU (`nvidia-smi` + a CUDA matmul) · Docker-in-sandbox · headless Chromium launches · desktop/VNC · macOS · Windows · ARM64 · session length ≥ 1 h / 24 h (long-run probe, run occasionally).
-
-### Later tracks
-`gpu` (time to GPU ready, matmul throughput, $/GPU-hour), `browser` (time to Chromium ready, CDP page-load, computer-use desktop latency), `reliability` (error taxonomy over time, incident correlation), `dx` (time for a coding agent to reach a first working sandbox from the docs alone).
-
-## 5. Measurement protocol
-
-1. **Runner.** A fixed, dedicated VM in a declared region (v0.1: one US-East runner; v0.2: US-East, EU-West and AP-Southeast). Its spec, region and IP are recorded in each run manifest.
-2. **Interleaving.** Iterations go round-robin across configurations, with the order **shuffled each round**. This spreads time-of-day and network effects evenly, instead of running all of provider A and then all of provider B.
-3. **One operation in flight.** Lifecycle and state benchmarks run strictly sequentially: one sandbox operation at a time across the whole runner, so providers never compete for the client's CPU or network. Only the `scale` track runs operations concurrently, by design.
-4. **Iterations.** For latency, n = 30 measured iterations per configuration per run, plus 3 warm-up iterations. Warm-up iterations are recorded and flagged, never silently dropped. For state operations, n = 10 per run. Leaderboards aggregate a **rolling 7-day window**, which gives a few hundred samples per metric.
-5. **Cadence.** v0.1 runs daily; v0.2 runs every 6 hours. Expensive workloads (Terminal-Bench) run weekly.
-6. **Timeouts.** Create, restore, resume and fork time out at 120 s, and exec at 60 s. A timeout is a failure, never a sample capped at 120 s.
+1. **Runner.** Development runs happen locally. Published runs come from a fixed machine in a declared region (v0.1: US-East; v0.2: US-East, EU-West and AP-Southeast). Its spec and region are recorded in each run manifest.
+2. **Interleaving.** Iterations go round-robin across configurations, with the order **shuffled each round**.
+3. **One operation in flight.** Probes and boards run strictly sequentially, one sandbox operation at a time across the whole runner, so providers never compete for the client's CPU or network. Only the `scale` boards run operations concurrently, by design.
+4. **Iterations per run:**
+   - **Speed boards:** n = 30 per configuration, plus 3 warm-up iterations. Warm-up samples are recorded and flagged.
+   - **State boards:** n = 10.
+   - **Probes:** 3 attempts each, except `session-1h`, which runs weekly.
+   - **Window:** boards and probe pass rates aggregate a **rolling 7-day window**.
+5. **Cadence.** v0.1 runs daily; v0.2 runs every 6 hours.
+6. **Timeouts.** Create, restore, resume and fork time out at 120 s, and exec at 60 s. A timeout is a failure, never a sample capped at the timeout.
 7. **Error attribution.**
-   - **Provider errors** (5xx, timeouts, wrong results, rate limits on documented-normal usage) count as failures for the configuration.
-   - **Harness errors** (our bug, our expired credentials, our exhausted credits) are excluded, logged, and shown in the run report.
-   - The error taxonomy is stored with every failed sample.
-8. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run. Leaked sandboxes are reported.
-9. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. See [GOVERNANCE](GOVERNANCE.md#accounts-and-credits).
+   - **Provider errors** (5xx, timeouts, wrong results, rate limits under documented-normal usage) count as failures.
+   - **Harness errors** (our bug, our expired credentials, our exhausted credits) are excluded and logged in the run report.
+8. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run.
+9. **Accounts.** Each configuration runs on free-tier credits or credits the provider has given us, recorded in its metadata ([GOVERNANCE](GOVERNANCE.md#accounts-and-credits)).
 
-## 6. Statistics and presentation
+## 8. Rankings and statistics
 
-- **Reported per metric:** n, success rate, p50, p90, p99 (p99 only when n ≥ 100), min and max, plus a bootstrap 95% CI for the median.
-- **Success rate always appears next to latency,** in the same table cell or chart.
-- **Charts:** ECDF or box plots by default, with an option to view all samples. A mean is never shown on its own.
-- **Ranking.** Configurations are ordered by median. Configurations whose 95% CIs overlap share a **rank band** ("statistically tied"). This is the LMArena approach to ranks under uncertainty.
-- **Freshness.** Every number shows the date of its window. Configurations with no successful run in 14 days are marked `stale`.
+**Main leaderboard:**
+- One row per configuration, **ranked by probe score**. Equal scores share a rank.
+- Columns: probe score with the pass count, the headline board medians (start, start with toolset, resume, fork×10) with their start-mode and memory tags, and $/h.
+- Every column can be sorted.
 
-## 7. Cost
+**Board rankings:**
+- Ordered by median.
+- Configurations whose bootstrap 95% CIs for the median overlap share a **rank band** ("statistically tied").
 
-Cost is reported in two separate ways.
+**Per-metric detail:**
+- n, success rate, p50, p90, p99 (p99 only when n ≥ 100), min and max.
+- An ECDF chart, with every sample available to view.
+
+**Probe matrix:** configurations × probes, showing ✓ / ✗ / — with success rates. Every cell links to its raw attempts.
+
+**Freshness:** every number shows its date window. A configuration with no successful run in 14 days is marked `stale`.
+
+## 9. Cost
 
 1. **List-price model.** `pricing/pricing.yaml` stores every rate with its source URL and the date it was checked. From it we compute:
-   - `$/hour @ 2c4g, 100% CPU`, the worst case for CPU-bound work;
-   - `$/hour @ 2c4g, 10% CPU`, a typical agent waiting on an LLM. This difference matters for providers that bill only active CPU (Vercel, Cloudflare, Sprites);
-   - platform fees (monthly minimums), shown separately rather than amortized.
-2. **Measured cost per task** (v0.2 onward). We run a workload, then read the provider's billing or usage API, or the invoice delta, and report `$ per 100 Terminal-Bench tasks` or `$ per 1000 cold starts`. Where usage can't be read back, the configuration is marked `estimated`.
+   - `usd_per_hour_full`: 2c4g at 100% CPU.
+   - `usd_per_hour_idle`: 2c4g at 10% CPU, a typical agent waiting on an LLM. This differs from the full figure for providers that bill only active CPU.
+   - Platform fees (monthly minimums), shown separately.
+2. **Measured cost** (v0.2 onward). After a workload, we read the provider's usage API or the invoice delta and report e.g. `$ per 1000 starts`. Where usage can't be read back, the result is marked `estimated`.
 
-Each cost page explains what makes prices hard to compare: how a "core" is defined (vCPU vs physical core), fixed CPU:RAM ratios, per-creation fees, billing minimums, snapshot storage costs, and region multipliers.
+Each cost page notes what makes prices hard to compare: how a "core" is defined, fixed CPU:RAM ratios, per-creation fees, billing minimums and snapshot storage.
 
-## 8. Scores and rankings
+## 10. Versioning
 
-- **Per-metric leaderboards** are the primary view.
-- **Track score.** Within a track, each configuration gets the geometric mean over metrics of `(value + shift) / (best + shift)`, the ClickBench method. The shift is 10 ms for latency, which stops tiny absolute differences from producing huge ratios. Lower is better; 1.0 is the best on every metric.
-- **Unsupported is N/A, not zero.** A configuration that doesn't claim a capability is left out of that track's ranking and shown as "not supported". One that claims a capability and fails the probe is ranked with a penalty: twice the worst value observed, the same as ClickBench's treatment of nulls.
-- **Persona views.** These are named weightings of track scores with the weights visible, e.g. *Interactive coding agent*, *RL / eval rollouts*, *Long-lived stateful agent*. Users can adjust the weights in the UI. **There is no default "overall #1" on the home page.**
-
-## 9. Versioning and change control
-
-- Any change to a timing boundary, workload, standard image or scoring formula bumps the harness **minor** version (or **major** if it breaks comparability) and is recorded in `CHANGELOG.md` with its reason.
-- SDK versions are pinned in a lockfile, and upgrades go through PRs. An SDK bump that moves a metric by more than 20% is called out in the run report.
-- Methodology changes that affect rankings follow the RFC process in [GOVERNANCE.md](GOVERNANCE.md).
+- **Suite version** (`core-vX.Y`):
+  - Adding or changing a probe bumps it.
+  - Probe scores are compared only within one suite version.
+  - The site shows the current suite and keeps older suites' results archived.
+- **Harness version** (semver):
+  - A change to a timing boundary, a verifier or the scoring bumps the minor version.
+  - A change that breaks comparability bumps the major version.
+  - Every bump is logged in `CHANGELOG.md`.
+- **SDK versions** are pinned, and upgrades go through PRs. An SDK bump that moves a metric by more than 20% is called out in the run report.
+- **New categories, scoring changes and timing-boundary changes** follow the RFC process in [GOVERNANCE.md](GOVERNANCE.md#changing-the-benchmark).
