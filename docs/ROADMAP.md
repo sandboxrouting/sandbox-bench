@@ -4,7 +4,7 @@
 
 The launch wedge is **"lifecycle + state"**, made up of:
 
-- honest cold-start numbers, taken through native SDKs;
+- cold-start numbers, taken through native SDKs;
 - **the first independent check of whether snapshot, pause/resume and fork really keep memory and processes, and how fast they are.**
 
 These are the most heavily marketed claims in the sandbox market, and no one has verified them. That is a launch story people will want to share.
@@ -24,13 +24,13 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 
 **Harness:** Python 3.12 with `uv` (see [ARCHITECTURE](ARCHITECTURE.md#stack)).
 
-**Accounts and credits:** every provider runs on its free-tier allowance or on credits the vendor gives the project. Credits are disclosed per configuration in `FUNDING.md` (see [GOVERNANCE §3](GOVERNANCE.md#3-accounts-and-credits)).
+**Accounts and credits:** every provider runs on its free-tier allowance or on credits the vendor gives the project. Each configuration notes its credit source (see [GOVERNANCE](GOVERNANCE.md#accounts-and-credits)).
 
 ### Week 0: foundations (2–3 days)
 - [ ] Create provider accounts, claim free-tier credits, and ask each launch vendor for benchmark credits.
-- [ ] Check each provider's ToS for benchmark-publication clauses (GOVERNANCE §10). Record the findings.
+- [ ] Check each provider's ToS for benchmark-publication clauses ([GOVERNANCE](GOVERNANCE.md#terms-of-service)). Record the findings.
 - [ ] Repo hygiene:
-  - [ ] `CODE_OF_CONDUCT.md`, `SECURITY.md`, `MAINTAINERS.md` (with disclosures) and `FUNDING.md`.
+  - [ ] `CODE_OF_CONDUCT.md`, `SECURITY.md`, and `MAINTAINERS.md`.
   - [ ] Issue templates: `new-provider`, `new-benchmark`, `dispute`, `bug`.
   - [ ] PR template, and a `ruff` + `pytest` CI.
 - [ ] Turn on GitHub Discussions, and open "Ideas for benchmarks" and "Provider requests" threads.
@@ -65,8 +65,8 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 - [ ] Collect at least 7 days of data before launch, so the first public numbers are a window and not a single run.
 
 ### Week 4: vendor preview and launch
-- [ ] Send the 7-day preview to every included vendor (GOVERNANCE §5) and invite vendor notes and adapter reviews.
-- [ ] Fix valid adapter issues and log all disputes publicly.
+- [ ] Send the 7-day preview to every included vendor ([GOVERNANCE](GOVERNANCE.md#working-with-providers)) and invite vendor notes and adapter reviews.
+- [ ] Fix any adapter issues providers raise.
 - [ ] Write the launch post. Lead with the state-ops findings, e.g. "We paused 8 sandboxes 1,000 times. Here's which ones kept your memory." Include methodology and limitations up front.
 - [ ] Launch: Show HN, X/LinkedIn, r/LocalLLaMA and agent-builder communities. Tag vendors respectfully.
 - [ ] Publish `CONTRIBUTING.md` paths for "add a provider" and "add a benchmark", plus 10 or more `good-first-issue`s, such as new probes, a new provider adapter, or a chart improvement.
@@ -91,17 +91,17 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 | Release | Theme | Contents |
 |---|---|---|
 | **v0.2** (launch + 4–6 weeks) | Workloads, scale and regions | <ul><li>`workloads/terminal-bench`: a Harbor oracle run, weekly, at fixed concurrency</li><li>`workloads/repo-test`, `cpu`, `disk-io` and `network`</li><li>`scale/burst` reported as capacity</li><li>Three runner regions and a 6-hour cadence</li><li>Persona views on the site</li><li>The TypeScript bridge, which brings in Freestyle and Cloudflare</li><li>`default` vs `optimized` divisions</li></ul> |
-| **v0.3** | Measured cost and reliability | <ul><li>Billing-API reconciliation, giving `$ per 100 tasks`</li><li>An error taxonomy dashboard</li><li>The mystery-shopper process running</li><li><strong>Vendor-submitted results:</strong> vendors run the harness on their own accounts and submit the output, published in a separate <code>submitted</code> division (see <a href="GOVERNANCE.md#7-vendor-submitted-results">GOVERNANCE §7</a>)</li><li>Regression alerts that open an issue and ping the vendor when a metric gets more than 20% worse</li><li>A public results API (static JSON)</li></ul> |
+| **v0.3** | Measured cost and reliability | <ul><li>Billing-API reconciliation, giving `$ per 100 tasks`</li><li>An error taxonomy dashboard</li><li><strong>Vendor-submitted results:</strong> vendors run the harness on their own accounts and submit the output, published in a separate <code>submitted</code> division (see <a href="GOVERNANCE.md#submitted-results-planned">GOVERNANCE</a>)</li><li>Regression alerts that open an issue and ping the vendor when a metric gets more than 20% worse</li><li>A public results API (static JSON)</li></ul> |
 | **v0.4** | Specialized environments | <ul><li>`gpu` track: time to GPU ready, matmul throughput, $/GPU-hour</li><li>`browser` track: Chromium ready, CDP page loads, desktop/VNC latency</li><li>macOS/Windows probes</li><li>Docker-in-sandbox</li><li>Scale-to-zero auto-wake</li></ul> |
 | **v0.5** | Security and networking (non-destructive) | <ul><li>Egress allowlist enforcement</li><li>Secret-injection behavior</li><li>Exposed-port and preview-URL latency</li><li>Isolation *documentation* checks (no attack testing)</li></ul> |
-| **v1.0** | Governance maturity | <ul><li>A steering group (maintainers plus a rotating community seat; vendors advise without voting)</li><li>RFC process in active use</li><li>Citation-policy badges</li><li>Yearly "State of Agent Sandboxes" report</li><li>An evaluation of fiscal hosting (e.g. OpenCollective or a foundation)</li></ul> |
+| **v1.0** | Governance maturity | <ul><li>A steering group (maintainers plus a rotating community seat; vendors advise without voting)</li><li>RFC process in active use</li><li>Verified badges providers can embed</li><li>Yearly "State of Agent Sandboxes" report</li><li>An evaluation of fiscal hosting (e.g. OpenCollective or a foundation)</li></ul> |
 | **Later / research** | New ideas | <ul><li>A `dx` track: a coding agent onboards from the docs alone</li><li>Opt-in "observed in production" telemetry</li><li>BYOC / self-hosted track</li><li>Long-session (24 h+) soak tests</li><li>A sandbox recommendation wizard driven by persona weights</li></ul> |
 
 ## Risks and mitigations
 
 | Risk | Mitigation |
 |---|---|
-| Accusations of bias | Native SDKs, public data, disclosed credits, and right of reply |
+| Providers disagree with results | Native SDKs, public data, provider notes, and issues worked out in public |
 | Vendor ToS forbids publishing results | ToS check before inclusion; ask for permission in writing and publish the exchange |
 | Costs grow with tracks and regions | Budget guard, vendor-given credits, vendor-submitted results for expensive tracks, and weekly cadence for expensive workloads |
 | Maintainer burnout (the TechEmpower lesson) | Small scope, automate everything, vendors maintain their own adapters, and an explicit "not now" list |

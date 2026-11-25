@@ -1,76 +1,64 @@
 # Vision
 
-## One sentence
+**sandbox-bench is the place to compare cloud sandboxes for AI agents: real measurements, every workload that matters, and every raw sample public.**
 
-**sandbox-bench is a neutral, open-source benchmark for cloud sandbox providers used by AI agents. It measures what matters, publishes every raw sample, and lets each team decide which provider fits its workload.**
+## Why
 
-## The problem
+There are now more than 15 sandbox providers: E2B, Daytona, Modal, Vercel, Cloudflare, Blaxel, Tensorlake, Morph, Freestyle, Beam, Northflank, Fly Sprites, and more every month. Picking one usually comes down to launch posts and docs pages.
 
-Agent builders now choose between 15+ sandbox providers: E2B, Daytona, Modal, Vercel, Cloudflare, Blaxel, Tensorlake, Morph, Freestyle, Beam, Northflank, Fly Sprites, and new ones every month. Today the choice is made on:
+The features that matter most for agents are the ones that are hardest to compare:
 
-- **Vendor claims nobody has reproduced.** "Sub-90 ms creation" became 483–819 ms in third-party tests, and "~150 ms" became 264–1041 ms.
-- **Benchmarks run by people with a stake in the result.** These include vendors ranking themselves first, a router that sells sponsor placements and private benchmarks, and sites that sell "reports to improve your rank".
-- **Create latency only.** The operations that make agent workloads cheap and robust are snapshot/restore, pause/resume *with memory intact*, and fork. They are the most heavily marketed features and nobody independently checks them.
-- **Feature matrices copied from docs.** A matrix says "supports fork" but nothing checks that it works.
+- snapshot and restore;
+- pause and resume with memory intact;
+- forking a running sandbox;
+- cost when an agent spends most of its time waiting on an LLM.
 
-(Evidence and sources: [research/landscape-2026-11.md](research/landscape-2026-11.md).)
+Almost nobody measures these. We do.
 
-## What we are building
+(More context: [research/landscape-2026-11.md](research/landscape-2026-11.md).)
 
-1. **A harness.** It calls each provider through its own native SDK and puts the same standard workloads through each one.
-2. **Tracks.** These are independent families of benchmarks (lifecycle, state, workloads, scale, GPU, browser, cost…). A provider is only ranked in the tracks it supports.
-3. **A verified capability matrix.** Every "✓" comes from an executable probe that passed, not from a docs page.
-4. **An open dataset.** Every sample, with harness version, SDK version, region, plan and timestamp, is committed to git.
-5. **A static website.** It offers per-track leaderboards, persona views ("best for RL rollouts", "best for interactive coding agents"), provider profiles with history, and a methodology page that matches the code.
+## What we're building
 
-## Who it serves and why they come back
+1. **A harness.** It talks to each provider through its own SDK and runs the same workloads everywhere.
+2. **Tracks.** These are families of benchmarks: lifecycle, state, workloads, scale, GPU, browser, cost. A provider is ranked only in the tracks it supports.
+3. **A capability matrix.** Each ✓ means a probe passed, not that a docs page says so.
+4. **An open dataset.** Every sample is in git, so anyone can slice it their own way.
+5. **A website.** It has leaderboards per track, persona views, provider pages with history, and side-by-side comparisons.
 
-| Audience | What they get | Why they come back |
-|---|---|---|
-| **Agent builders / platform teams** | A trustworthy shortlist for their workload, with distributions rather than marketing numbers | Data refreshes continuously, and history shows who is improving |
-| **Sandbox providers** | (a) A neutral place where buyers already look, so being *absent* costs them. (b) A per-metric breakdown of where they lag, i.e. a free performance team. (c) Public credit when they improve ("Provider X cut resume p50 by 40% this month"). (d) Verified capability badges they can cite. | Regression alerts, an "Optimized" division to show their best config, and a seat at the table when new tracks are designed |
-| **Researchers / community** | A clean, versioned dataset and an easy way to propose new benchmarks | A low-friction RFC process and recognition for contributors |
+## Who it's for
 
-The vendor incentive is the flywheel. **If builders trust the numbers, vendors have to be listed, and to be listed they help us keep adapters correct.** So trust is the product, and every design decision should protect it.
+- **Agent builders** get a shortlist that fits their workload, and can see who is improving month over month.
+- **Sandbox providers** see where they stand on each metric and what to improve next. They get credit when the numbers move, and verified badges they can point to.
+- **The community** gets an easy place to propose new benchmarks and a clean dataset to dig into.
 
-## Positioning versus what exists
+Builders come to compare, so providers want to be listed. Providers want to be listed, so they help keep adapters sharp and suggest new tracks. That loop is what grows the benchmark.
 
-| | Typical existing benchmark | sandbox-bench |
-|---|---|---|
-| Operator | Vendor or router with a commercial stake | Non-profit, with funding disclosed, no paid placement and no paid private benchmarks |
-| Client | One abstraction layer | Each provider's **native SDK**, pinned and public |
-| Metrics | Create latency, sometimes a composite | Lifecycle, **state ops (snapshot, restore, pause/resume, fork) with correctness checks**, workloads, cost, verified capabilities |
-| Statistics | Median or best-of-N, no date | Full distributions, confidence intervals, success rate shown next to every latency figure, dated runs, history |
-| Data | Website only | Every raw sample in git, with one-command reproduction |
-| Ranking | One global score | Per-track ranks with **statistical-tie bands**, and persona views with visible, adjustable weights |
-| Vendors | Passive subjects or paying sponsors | Right of reply, public dispute process, citation policy |
+## How we work
 
-## Principles (non-negotiable)
+Results can't be bought. Every provider runs through the same harness and rules, and the data is public. Beyond that, we'd rather the numbers speak.
 
-1. **Neutral.** No paid placement, no sponsor logos in result tables, and no private benchmarks for sale. Funding and conflicts of interest are disclosed.
-2. **Transparent.** Methodology is code, all data is public, and every chart links to the samples behind it.
-3. **Fair.** Native SDKs, comparable resource sizes, the same workloads, and the same rules for everyone. Failures count against the provider and harness bugs do not.
-4. **Honest about uncertainty.** Distributions over single numbers, ties where confidence intervals overlap, and a date on everything.
-5. **Pluralistic.** No single "best sandbox". Workloads differ, so rankings are per track and per persona.
-6. **Extensible.** Adding a provider or a benchmark is a small, well-documented PR, and new tracks go through an open RFC.
-7. **Sustainable.** Start small, automate everything, and budget maintainer time. (TechEmpower was archived in 2026 after maintainer burnout.)
+Day to day, that means:
 
-## Non-goals (for now)
+- **Measure what agents actually do.** Use real operations and real workloads, and treat correctness as part of the result.
+- **Show the whole picture.** Show distributions, success rates and dates, not a single magic number.
+- **Make adding things easy.** A new provider or benchmark should be a small PR.
+- **Ship small, iterate fast.** Launch narrow, then grow where people pull.
 
-- Benchmarking self-hosted runtimes (Firecracker, gVisor, microsandbox) outside a provider. This could become a separate track later.
-- Security penetration testing of providers. We only verify *documented* isolation and egress behavior, non-destructively and within each provider's terms of service.
-- Commercial services: consulting, paid reports, or paid "claimed profiles".
-- A subjective review site. Every published number must come from a reproducible measurement.
+## Not (yet) in scope
+
+- Self-hosted runtimes outside a provider, such as Firecracker, gVisor or microsandbox. This may become a track later.
+- Security penetration testing. We check documented behavior, such as egress rules, without attacking anyone's infrastructure.
+- Opinion-based reviews. If it's on the site, it was measured.
 
 ## What success looks like
 
-**At launch (v0.1):**
-- 6–8 provider configurations measured continuously on two tracks (Lifecycle, State).
-- At least one vendor replies publicly or opens a PR.
-- The site is cited in at least one "which sandbox should I use" discussion.
+**At launch:**
+- 6–8 provider configurations measured daily on lifecycle and state.
+- At least one provider engages: a reply, a PR or a note.
+- People start linking to the site when someone asks "which sandbox should I use?"
 
-**At 6 months:**
+**At six months:**
 - 12+ configurations and 5+ tracks.
-- Vendors maintain their own adapters under our review.
-- Outside contributors have added at least two benchmarks.
-- Vendors quote our numbers under the citation policy.
+- Providers maintain their own adapters.
+- Outside contributors have added new benchmarks.
+- Providers quote our numbers.

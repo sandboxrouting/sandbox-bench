@@ -13,12 +13,12 @@
 | **Metric** | One number a benchmark produces, e.g. `resume_ready_ms` or `memory_preserved`. |
 | **Sample** | One measurement of one metric in one iteration. |
 | **Run** | One execution of a set of benchmarks against a set of configurations. It has a `run_id` and a manifest. |
-| **Division** | `default` (stock SDK, documented defaults, publicly available plan), `optimized` (any documented feature or plan, disclosed) or `submitted` (vendor-run, see [GOVERNANCE §7](GOVERNANCE.md#7-vendor-submitted-results)). Divisions are never mixed in one ranking. |
+| **Division** | `default` (stock SDK, documented defaults, publicly available plan), `optimized` (any documented feature or plan, disclosed) or `submitted` (run on someone else's account, see [GOVERNANCE](GOVERNANCE.md#submitted-results-planned)). Divisions are never mixed in one ranking. |
 | **Harness version** | A semver tag of this repo. A **major** bump means numbers are not comparable across versions. |
 
 ## 2. Standard sandbox spec
 
-The aim is to compare like with like and to allow no hidden tuning.
+These settings keep comparisons like for like.
 
 - **Size:** 2 vCPU / 4 GiB RAM / ≥10 GiB disk. Where a provider has fixed shapes, we use the nearest shape at or above it and record the actual shape. Example: Cloudflare `standard-3` is 2 vCPU / 8 GiB.
 - **Images:** two modes, each reported separately.
@@ -108,7 +108,7 @@ Probes: custom OCI image · outbound internet · egress allowlist enforced · ex
    - **Harness errors** (our bug, our expired credentials, our exhausted credits) are excluded, logged, and shown in the run report.
    - The error taxonomy is stored with every failed sample.
 7. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run. Leaked sandboxes are reported.
-8. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. Vendor-provided accounts are cross-checked periodically against a free-tier account ([GOVERNANCE §3](GOVERNANCE.md#3-accounts-and-credits)).
+8. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. See [GOVERNANCE](GOVERNANCE.md#accounts-and-credits).
 
 ## 6. Statistics and presentation
 
@@ -120,7 +120,7 @@ Probes: custom OCI image · outbound internet · egress allowlist enforced · ex
 
 ## 7. Cost
 
-Cost is reported in two separate ways, and the two are never blended into one figure.
+Cost is reported in two separate ways.
 
 1. **List-price model.** `pricing/pricing.yaml` stores every rate with its source URL and the date it was checked. From it we compute:
    - `$/hour @ 2c4g, 100% CPU`, the worst case for CPU-bound work;
@@ -128,7 +128,7 @@ Cost is reported in two separate ways, and the two are never blended into one fi
    - platform fees (monthly minimums), shown separately rather than amortized.
 2. **Measured cost per task** (v0.2 onward). We run a workload, then read the provider's billing or usage API, or the invoice delta, and report `$ per 100 Terminal-Bench tasks` or `$ per 1000 cold starts`. Where usage can't be read back, the configuration is marked `estimated`.
 
-Caveats are shown on the page, not hidden in footnotes: how a "core" is defined (vCPU vs physical core), fixed CPU:RAM ratios, per-creation fees, billing minimums, snapshot storage costs, and region multipliers.
+Each cost page explains what makes prices hard to compare: how a "core" is defined (vCPU vs physical core), fixed CPU:RAM ratios, per-creation fees, billing minimums, snapshot storage costs, and region multipliers.
 
 ## 8. Scores and rankings
 

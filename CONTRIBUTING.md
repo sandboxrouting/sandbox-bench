@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for helping make sandbox-bench useful and trustworthy. Please read [GOVERNANCE.md](docs/GOVERNANCE.md) first. It explains what vendors and contributors can change, and what only maintainers can change.
+Thanks for helping out! Whether you run a sandbox platform, build agents, or just have a good benchmark idea, there's a place for you here. [GOVERNANCE.md](docs/GOVERNANCE.md) explains how providers, contributors and maintainers work together.
 
 ## Ways to contribute
 
@@ -11,14 +11,14 @@ Thank you for helping make sandbox-bench useful and trustworthy. Please read [GO
 | Add a provider adapter | Follow the checklist in [ARCHITECTURE.md](docs/ARCHITECTURE.md#extensibility-checklists). One folder under `providers/`. |
 | Add a benchmark to an existing track | One folder under `benchmarks/`, plus a design note in the PR |
 | Propose a new track or change scoring or timing | Write an RFC in `docs/rfcs/`. It stays open for comment for 14 days. |
-| Submit results you ran on your own account (planned for v0.3) | Run a tagged harness release, package the output with `sbx submit`, and open a PR. Results appear in the `submitted` division. See [GOVERNANCE §7](docs/GOVERNANCE.md#7-vendor-submitted-results). |
-| Dispute a result | Open an issue with the `dispute` template. Disputes are handled in public. |
+| Submit results you ran on your own account (planned for v0.3) | Run a tagged harness release, package the output with `sbx submit`, and open a PR. Results appear in the `submitted` division. See [GOVERNANCE](docs/GOVERNANCE.md#submitted-results-planned). |
+| Think a result looks wrong | Open an issue with the `dispute` template and we'll dig in together. |
 
 ## Rules for adapters
 
 - Use the provider's **public** SDK, pinned to a version.
 - Keep adapters thin. Adapters must not retry, pre-warm, cache, or do their own timing; the harness does all timing.
-- Declare capabilities honestly in `provider.yaml`. Probes check them on every run.
+- Declare capabilities in `provider.yaml`. Probes check them on every run.
 - Vendor employees are welcome to contribute. Disclose your affiliation in the PR. Merging still needs approval from a non-vendor maintainer.
 
 ## Development

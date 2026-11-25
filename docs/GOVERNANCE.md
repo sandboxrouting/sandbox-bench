@@ -1,94 +1,66 @@
-# Governance and fairness policy
+# Governance
 
-People only use a benchmark they trust. This document says, in advance, how we keep sandbox-bench neutral and how vendors and contributors take part.
+How providers, contributors and maintainers work together on sandbox-bench.
 
-## 1. Neutrality charter
+**The short version:**
+- Results can't be bought.
+- Everyone runs through the same harness.
+- Maintainers own how things are measured.
+- Providers are welcome collaborators.
 
-1. **No pay-to-play.** We never sell placement, logos in result tables, "claimed profiles", early access to data, private benchmarks, or advisory seats.
-2. **Funding disclosure.** `FUNDING.md` lists every source of money, credits or infrastructure, with amounts. Donations and grants are welcome, but they never buy influence over methodology.
-3. **Conflict-of-interest disclosure.**
-   - Every maintainer lists their employer and any commercial ties in `MAINTAINERS.md`.
-   - Maintainers recuse themselves from reviewing PRs, disputes or RFCs that affect their employer or a direct competitor's ranking.
-4. **One harness.** Maintainers own the timing code, workloads, timeouts and scoring. Vendors may contribute *adapters* but cannot change how measurement works (§4).
-
-## 2. Divisions
+## Divisions
 
 | Division | Rules | Purpose |
 |---|---|---|
-| `default` | Public SDK at a pinned version, the standard sandbox spec, a publicly available plan, documented defaults only | The comparable, headline view |
-| `optimized` | Any documented, generally available feature or plan, e.g. warm pools, enterprise tier, custom kernel. The configuration is disclosed in full. | Lets vendors show their best case |
-| `submitted` | Results a vendor produced by running the official harness on its own account (§7) | Coverage for tracks too expensive for us to run, such as GPU fleets and large-scale bursts |
+| `default` | Public SDK at a pinned version, the standard sandbox spec, a publicly available plan, documented defaults | The headline, like-for-like view |
+| `optimized` | Any generally available feature or plan (warm pools, bigger tiers…), with the configuration disclosed | A provider's best case |
+| `submitted` | Results a provider or community member ran on their own account with the official harness (see below) | Tracks that are too expensive for us to run ourselves |
 
-Features in beta or preview are tagged `preview` and kept out of `default` rankings.
+Beta features are tagged `preview` and kept out of `default`.
 
-## 3. Accounts and credits
+## Accounts and credits
 
-- Every configuration runs on one of two sources: **the provider's free-tier allowance**, or **credits the vendor gives the project**.
-- The source of each configuration's credits is listed in `FUNDING.md` and in its metadata.
-- Accepting credits never affects inclusion or ranking. A vendor that gives no credits is still measured on its free tier, as far as that tier allows.
-- **Mystery-shopper check.** At least monthly, each configuration that runs on vendor-given credits or a vendor-provisioned account is also measured from an ordinary free-tier account. If the two differ by more than the confidence intervals allow, we investigate.
+- Every configuration runs on the provider's free-tier allowance or on credits the provider gives the project. Each configuration notes which.
+- Credits never affect inclusion or ranking.
+- Now and then, we re-run provider-given accounts from a plain free-tier account to make sure the numbers match.
 
-## 4. Adapters and vendor contributions
+## Adapters
 
-- Each adapter is a thin, readable module that maps our interface to the vendor's **public** SDK. Code paths only available to the benchmark (special endpoints, pre-warming) are prohibited in `default`.
-- Vendors may become CODEOWNERS of their own adapter. Every change still needs approval from a non-vendor maintainer.
-- Every adapter declares its capabilities, sandbox type, plan and SDK version in `provider.yaml`. A false capability claim fails the capability probes, which is visible to everyone.
+- An adapter is a thin module over the provider's public SDK. The harness does all the timing.
+- Providers can co-own their adapter (CODEOWNERS). A maintainer still approves each change.
+- `provider.yaml` declares capabilities, sandbox type, plan and SDK version. Every claimed capability is checked by a probe on every run.
 
-## 5. Publication cycle and right of reply
+## Working with providers
 
-1. **Continuous data** is published automatically. It carries a banner: "automated results, see methodology".
-2. **Major releases**, such as a new track, a launch, or a methodology version, go to every affected vendor **7 days before publication** through a private email and a public tracking issue with no numbers in it.
-3. **Vendor notes.** Each provider profile has an optional vendor statement of up to 500 characters, displayed as-is and labelled as the vendor's.
-4. **Disputes** are filed as public GitHub issues using the `dispute` template. Maintainers acknowledge within 5 working days, and the outcome is recorded in `docs/disputes/`. While a dispute is open, the result stays published and is annotated.
+- **Heads-up before big releases.** Affected providers get a 7-day preview before a new track or a methodology version ships.
+- **Provider notes.** Each provider page has room for a short statement from the provider.
+- **Issues.** If something looks off, open an issue with the `dispute` template and we'll work it out in public.
+- **Reproducibility.** If results can't be reproduced, we annotate them and may pull them until they can.
 
-## 6. Anti-gaming and sanctions
+## Submitted results *(planned)*
 
-We expect people to optimize for the benchmark, and we design for it:
+Some tracks cost more than free tiers and donated credits cover, such as GPU fleets, 1,000-sandbox bursts and long soak tests. For those, providers and community members can run the benchmark on their own accounts. This is an early design:
 
-- Workloads use randomized inputs where possible (random file contents, random buffer sizes within a range).
-- Accounts are unannounced and rotated, and the mystery-shopper check (§3) applies.
-- We watch for behaviour that only appears under benchmark conditions, such as detecting our image or tags.
+- Run a tagged harness release with unmodified benchmarks and the public adapter.
+- Package the results with `sbx submit`. This bundles the manifest, raw samples and logs.
+- Open a PR. CI checks the schema, the harness checksum and the declared configuration.
+- Results show up in the `submitted` division, labelled with who ran them. Maintainers re-run a sample when credits allow.
 
-**Sanctions ladder** (published ahead of time and applied the same way to everyone):
+This also gives us more client regions for free.
 
-1. Annotate the result.
-2. Re-measure from a fresh free-tier account.
-3. Withhold the affected results.
-4. Delist the configuration for one release.
-5. Publish a disclosure.
+## Quoting results
 
-## 7. Vendor-submitted results
-
-Some tracks cost more than free tiers and donated credits can cover, such as GPU fleets, 1,000-sandbox bursts or long soak tests. Vendors can fill that gap by running the benchmark themselves. The design is still open. Starting points:
-
-- **Same harness, same rules.** A vendor runs a tagged release of the official harness with an unmodified benchmark and its public adapter. `sbx submit` packages the manifest, every raw sample and the full run logs.
-- **Submitted through a PR.** The PR is validated in CI: schema, harness checksum and the configuration declared in `provider.yaml`.
-- **Shown in its own `submitted` division.** It is labelled "vendor-run" and never mixed into maintainer-run rankings.
-- **Spot-checked.** Maintainers re-run a sample of each submission whenever credits allow. Submissions that can't be reproduced within the confidence intervals are annotated, and the sanctions ladder (§6) applies.
-- **Open to everyone.** Community members can submit runs from their own accounts the same way. This also adds more client regions.
-
-## 8. Citation policy (for vendors and press)
-
-You are welcome to quote sandbox-bench results if you include:
-
-- the metric name and division;
-- the harness version and date window (e.g. "sandbox-bench v0.1, 2026-12-01 → 12-07");
+You're welcome to quote results. Please include:
+- the metric and division;
+- the harness version and date window;
 - a link to the result page.
 
-You may not:
+## Changing the benchmark
 
-- present a `preview`, `optimized` or `submitted` result as `default`;
-- claim an overall "#1" that our pages don't show;
-- quote a result while omitting its success rate when the success rate is below 95%.
+- **New benchmark in an existing track:** a PR with a short design note, and approval from two maintainers.
+- **New tracks, scoring changes and timing-boundary changes:** an RFC in `docs/rfcs/`, open for 14 days.
+- **Every accepted change** goes in `CHANGELOG.md`.
 
-Repeated misuse is noted publicly on the provider's profile.
+## Terms of service
 
-## 9. Changing the benchmark (RFCs)
-
-- **New benchmarks** that fit an existing track need a PR with a design note and approval from two maintainers.
-- **New tracks, scoring changes and timing-boundary changes** need an RFC in `docs/rfcs/`, open for 14 days. Vendors are pinged and may comment, and maintainers decide.
-- **Every accepted change** is logged in `CHANGELOG.md` with its version impact.
-
-## 10. Terms of service
-
-Before a provider is added, a maintainer checks its terms for benchmark-publication ("DeWitt") clauses and records the finding in `provider.yaml`. Where publication is restricted, we ask the vendor for written permission and publish that exchange. We never run probes that would breach acceptable-use terms, such as abusive load or attempts to escape isolation.
+Before adding a provider, we check its terms for benchmark-publication clauses and ask for permission where needed. We never run anything that would breach acceptable-use terms.

@@ -1,43 +1,48 @@
 # sandbox-bench
 
-**A neutral, open-source benchmark for the cloud sandboxes that AI agents run in.**
+**How fast does your sandbox really start? Does it still remember what it was doing after a pause? Can it fork itself ten times without breaking a sweat?**
 
-Choosing between E2B, Daytona, Modal, Vercel, Blaxel, Tensorlake, Morph and a dozen others currently means comparing vendor claims that nobody has reproduced. sandbox-bench measures the providers independently. It uses each vendor's native SDK and runs the same workloads on all of them. Every raw sample is published.
+sandbox-bench is an open benchmark for the cloud sandboxes AI agents run in. It drives E2B, Daytona, Modal, Vercel, Blaxel, Tensorlake, Morph and more through their own SDKs, runs the same workloads on every one, and publishes the results as a live leaderboard. The raw data sits right here in the repo.
 
-> **Status: pre-launch (v0.1 in progress).** Read the [roadmap](docs/ROADMAP.md) for scope and timeline.
+> 🚧 **Pre-launch.** v0.1 is under construction. See the [roadmap](docs/ROADMAP.md).
 
-## What it measures
+## What we measure
 
-| Track | Question it answers | Status |
-|---|---|---|
-| **Lifecycle** | How long until I can run a command? How fast are exec and file I/O? | v0.1 |
-| **State** | How fast are snapshot/restore, pause/resume and fork? **Do memory and processes actually survive them?** | v0.1 |
-| **Capabilities** | Which features does each provider have, *checked by executable probes* rather than copied from docs? | v0.1 (partial) |
-| **Cost** | What does an hour cost, at full CPU and in a realistic idle-heavy agent profile? | v0.1 (list price) → v0.3 (measured) |
-| **Workloads** | How do real tasks perform, such as repo clone/install/test, CPU, disk, network, and Terminal-Bench via Harbor? | v0.2 |
-| **Scale** | What success rate and latency do I get under burst and sustained concurrency? | v0.2 |
-| **GPU · Browser · macOS/Windows** | Are specialized environments available, how fast are they, and what do they cost? | v0.4 |
+| Track | The question |
+|---|---|
+| **Lifecycle** | How long until my first command runs? How snappy are exec and file I/O? |
+| **State** | How fast are snapshot, restore, pause/resume and fork, and do memory and processes survive them? |
+| **Capabilities** | Which features actually work? Every ✓ comes from a probe that passed. |
+| **Cost** | What does an hour cost at full tilt, and what does it cost while the agent is waiting on an LLM? |
+| **Workloads** *(soon)* | Real work: clone, install and test a repo, plus CPU, disk, network and Terminal-Bench via Harbor. |
+| **Scale** *(soon)* | What happens when you ask for 100 sandboxes at once? |
+| **GPU · Browser · macOS/Windows** *(later)* | The specialized stuff. |
 
-## Principles
+There is no single winner. Each track has its own leaderboard, and persona views (e.g. "RL rollouts" or "interactive coding agent") let you weight the tracks that matter to you.
 
-- **Neutral.** No paid placement, sponsor logos in results, or private benchmarks for sale. Funding and conflicts of interest are disclosed.
-- **Transparent.** The methodology is code, every sample is in git, and results can be reproduced with one command.
-- **Fair.** Native SDKs and comparable sizes for everyone. A success rate is shown next to every latency, and unsupported features are marked N/A rather than scored zero.
-- **Honest.** We show distributions and confidence intervals, rank providers that are statistically tied together, and date every number.
-- **Pluralistic.** There is no single "best sandbox". The site has per-track leaderboards and persona views with weights you can adjust.
+## Quickstart
 
-## Documentation
+*Coming with v0.1:*
 
-- [Vision](docs/VISION.md): why this exists, who it serves, and how it differs from existing benchmarks.
-- [Methodology](docs/METHODOLOGY.md): timing boundaries, correctness checks, statistics, cost model and scoring.
-- [Governance](docs/GOVERNANCE.md): neutrality charter, divisions, right of reply, anti-gaming rules, citation policy.
-- [Architecture](docs/ARCHITECTURE.md): harness design, adapter and benchmark interfaces, data schema.
-- [Roadmap](docs/ROADMAP.md): the v0.1 action plan and later releases.
-- [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md): existing benchmarks, precedents and provider features.
+```bash
+uv tool install sandbox-bench
+sbx run --providers e2b,modal --bench lifecycle/cold-start
+```
 
-## Contributing
+## Add your sandbox
 
-Ideas for new benchmarks, provider requests and adapter PRs are all welcome. Sandbox vendors are especially welcome to review their own adapters. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Run a sandbox platform? Adding it means writing one small adapter over your public SDK. Copy `providers/_template/`, implement `create`, `exec` and `destroy` (plus snapshot, fork and the rest if you support them), and open a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Have an idea for a benchmark? Open an issue or start a discussion. New tracks are very welcome.
+
+## Docs
+
+- [Vision](docs/VISION.md): why this exists and where it's going
+- [Methodology](docs/METHODOLOGY.md): exactly what gets timed and how results are scored
+- [Governance](docs/GOVERNANCE.md): how providers and contributors take part
+- [Architecture](docs/ARCHITECTURE.md): harness, adapters and data format
+- [Roadmap](docs/ROADMAP.md): what's next
+- [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md): what exists today
 
 ## License
 
