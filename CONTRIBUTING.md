@@ -11,6 +11,7 @@ Thank you for helping make sandbox-bench useful and trustworthy. Please read [GO
 | Add a provider adapter | Follow the checklist in [ARCHITECTURE.md](docs/ARCHITECTURE.md#extensibility-checklists). One folder under `providers/`. |
 | Add a benchmark to an existing track | One folder under `benchmarks/`, plus a design note in the PR |
 | Propose a new track or change scoring or timing | Write an RFC in `docs/rfcs/`. It stays open for comment for 14 days. |
+| Submit results you ran on your own account (planned for v0.3) | Run a tagged harness release, package the output with `sbx submit`, and open a PR. Results appear in the `submitted` division. See [GOVERNANCE §7](docs/GOVERNANCE.md#7-vendor-submitted-results). |
 | Dispute a result | Open an issue with the `dispute` template. Disputes are handled in public. |
 
 ## Rules for adapters

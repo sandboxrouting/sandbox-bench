@@ -32,7 +32,7 @@ Choosing between E2B, Daytona, Modal, Vercel, Blaxel, Tensorlake, Morph and a do
 - [Methodology](docs/METHODOLOGY.md): timing boundaries, correctness checks, statistics, cost model and scoring.
 - [Governance](docs/GOVERNANCE.md): neutrality charter, divisions, right of reply, anti-gaming rules, citation policy.
 - [Architecture](docs/ARCHITECTURE.md): harness design, adapter and benchmark interfaces, data schema.
-- [Roadmap](docs/ROADMAP.md): open decisions, the v0.1 action plan, and later releases.
+- [Roadmap](docs/ROADMAP.md): the v0.1 action plan and later releases.
 - [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md): existing benchmarks, precedents and provider features.
 
 ## Contributing

@@ -2,7 +2,7 @@
 
 The design goal is that **adding a provider means adding one folder, and adding a benchmark means adding one folder**, while the core harness stays small and owned by maintainers.
 
-## Stack decision
+## Stack
 
 **Python 3.12, managed with `uv`.** Why Python:
 
@@ -26,7 +26,7 @@ sandbox-bench/
 │   ├── reaper.py               #   tag-based cleanup of leaked sandboxes
 │   ├── stats.py                #   percentiles, bootstrap CI, rank bands
 │   ├── schema.py               #   pydantic models for results (source of truth)
-│   └── cli.py                  #   `sbx run|list|report|probe`
+│   └── cli.py                  #   `sbx run|list|report|probe|submit`
 ├── providers/
 │   └── e2b/
 │       ├── provider.yaml       #   configs, capabilities, plan, SDK pin, ToS note

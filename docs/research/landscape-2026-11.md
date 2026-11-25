@@ -16,7 +16,6 @@
 | [LogRocket comparison](https://blog.logrocket.com/comparing-ai-agent-sandbox-platforms-e2b-modal-daytona-and-more/) | Editorial | Create and resume to first command | Iterations, region and code not stated | Points out that **"resume" means different things on different providers**. |
 | [Superagent "benchmark"](https://www.superagent.sh/blog/ai-code-sandbox-benchmark-2026) | Editorial | Repeats vendor claims (Blaxel 25 ms, Daytona 90 ms, E2B 150 ms) | No measurement | These numbers are widely re-quoted as if they were benchmark results. |
 | [Firegoat Agent Arena](https://firegoat.ai/arena/sandboxes) | Firegoat (sells a paid "report to improve your rank") | A coding agent onboards itself onto each provider and is scored on time, cost and errors | New idea (DX for agents), but no code and no date | Pay-to-improve conflict. |
-| [zkwentz/sandbox-bench](https://zkwentz.github.io/sandbox-bench/) | Unknown | Full lifecycle with a 0–100 score and letter grades, best-of-3 | Best-of-N is a weak statistic | **Uses the same name as this project.** See ROADMAP, decision D1. |
 | [nibzard/ai-sandbox-benchmark](https://github.com/nibzard/ai-sandbox-benchmark) | Possibly Daytona-origin (*unverified*) | TUI covering 5 providers | Proof of concept | Treats Daytona specially and has no leaderboard. |
 | Vendor "X vs Y" pages (Fly.io, Upstash, Modal, Northflank, Morph, Blaxel…) | The vendors themselves | Feature matrices | Marketing | Each names itself "best overall". |
 

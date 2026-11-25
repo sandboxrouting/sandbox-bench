@@ -11,18 +11,6 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 
 ---
 
-## Open decisions (resolve before writing code)
-
-| # | Decision | Recommendation |
-|---|---|---|
-| **D1** | **Name.** `zkwentz/sandbox-bench` already exists with a public site, and two projects with the same name will confuse people. | Do a quick search, then either keep the name and claim a domain early, or pick something distinctive (e.g. `sandboxbench.org`, "OpenSandbox Bench", "Sandmark"). Decide before the launch post, because renaming afterwards is expensive. |
-| **D2** | **The GitHub org is `sandboxrouting`.** If you have or plan a routing product, that is exactly the conflict of interest people already criticize ComputeSDK for. | Move the repo to a neutral org (e.g. `sandbox-bench`). If a routing interest exists, disclose it prominently in `MAINTAINERS.md`. |
-| **D3** | **Funding for provider accounts.** | Start on self-serve free tiers and credits, which is roughly $30–80/month for v0.1 (see below). Disclose all of it in `FUNDING.md`. After launch, accept disclosed vendor credits and use the mystery-shopper check. Look at OpenCollective or GitHub Sponsors. |
-| **D4** | **Harness language.** | Python 3.12 with `uv`. See [ARCHITECTURE](ARCHITECTURE.md#stack-decision). |
-| **D5** | **Launch provider set.** | Seven providers with Python SDKs and free credits: **E2B, Daytona (container; Linux VM if accessible), Modal, Vercel Sandbox, Blaxel, Tensorlake, Morph**. Add Freestyle and Cloudflare in v0.2 through the TypeScript bridge. Check Runloop's status (it may be winding down). |
-
----
-
 ## v0.1 "Launch" (about 4 weeks of part-time work)
 
 **Scope:**
@@ -32,9 +20,15 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 - One runner region and daily runs.
 - A static site and raw data in git.
 
+**Launch providers:** E2B, Daytona (container, plus Linux VM if accessible), Modal, Vercel Sandbox, Blaxel, Tensorlake and Morph. All seven have Python SDKs and free-tier credits. Freestyle and Cloudflare join in v0.2 through the TypeScript bridge.
+
+**Harness:** Python 3.12 with `uv` (see [ARCHITECTURE](ARCHITECTURE.md#stack)).
+
+**Accounts and credits:** every provider runs on its free-tier allowance or on credits the vendor gives the project. Credits are disclosed per configuration in `FUNDING.md` (see [GOVERNANCE §3](GOVERNANCE.md#3-accounts-and-credits)).
+
 ### Week 0: foundations (2–3 days)
-- [ ] Resolve D1–D5.
-- [ ] Create provider accounts and check each provider's ToS for benchmark-publication clauses (GOVERNANCE §9). Record the findings.
+- [ ] Create provider accounts, claim free-tier credits, and ask each launch vendor for benchmark credits.
+- [ ] Check each provider's ToS for benchmark-publication clauses (GOVERNANCE §10). Record the findings.
 - [ ] Repo hygiene:
   - [ ] `CODE_OF_CONDUCT.md`, `SECURITY.md`, `MAINTAINERS.md` (with disclosures) and `FUNDING.md`.
   - [ ] Issue templates: `new-provider`, `new-benchmark`, `dispute`, `bug`.
@@ -81,7 +75,7 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 - A cold-start iteration keeps a sandbox alive for about 10 s. 33 iterations come to roughly $0.02 per configuration.
 - State benchmarks run 10 iterations at about 60 s each, roughly $0.03–0.10 per configuration.
 - Billing minimums can multiply this by 2–5×.
-- **Total: about 8 configurations × daily × 30 days ≈ $10–50/month, plus the runner VM at ~$10–15/month.** Free credits cover the first months.
+- **Total: about 8 configurations × daily × 30 days ≈ $10–50/month, plus the runner VM at ~$10–15/month.** This is covered by free-tier allowances and vendor-given credits.
 
 ### Launch success signals (review at launch + 30 days)
 - Vendor engagement: replies, adapter PRs and notes.
@@ -97,7 +91,7 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 | Release | Theme | Contents |
 |---|---|---|
 | **v0.2** (launch + 4–6 weeks) | Workloads, scale and regions | <ul><li>`workloads/terminal-bench`: a Harbor oracle run, weekly, at fixed concurrency</li><li>`workloads/repo-test`, `cpu`, `disk-io` and `network`</li><li>`scale/burst` reported as capacity</li><li>Three runner regions and a 6-hour cadence</li><li>Persona views on the site</li><li>The TypeScript bridge, which brings in Freestyle and Cloudflare</li><li>`default` vs `optimized` divisions</li></ul> |
-| **v0.3** | Measured cost and reliability | <ul><li>Billing-API reconciliation, giving `$ per 100 tasks`</li><li>An error taxonomy dashboard</li><li>The mystery-shopper process running</li><li>Regression alerts that open an issue and ping the vendor when a metric gets more than 20% worse</li><li>A public results API (static JSON)</li></ul> |
+| **v0.3** | Measured cost and reliability | <ul><li>Billing-API reconciliation, giving `$ per 100 tasks`</li><li>An error taxonomy dashboard</li><li>The mystery-shopper process running</li><li><strong>Vendor-submitted results:</strong> vendors run the harness on their own accounts and submit the output, published in a separate <code>submitted</code> division (see <a href="GOVERNANCE.md#7-vendor-submitted-results">GOVERNANCE §7</a>)</li><li>Regression alerts that open an issue and ping the vendor when a metric gets more than 20% worse</li><li>A public results API (static JSON)</li></ul> |
 | **v0.4** | Specialized environments | <ul><li>`gpu` track: time to GPU ready, matmul throughput, $/GPU-hour</li><li>`browser` track: Chromium ready, CDP page loads, desktop/VNC latency</li><li>macOS/Windows probes</li><li>Docker-in-sandbox</li><li>Scale-to-zero auto-wake</li></ul> |
 | **v0.5** | Security and networking (non-destructive) | <ul><li>Egress allowlist enforcement</li><li>Secret-injection behavior</li><li>Exposed-port and preview-URL latency</li><li>Isolation *documentation* checks (no attack testing)</li></ul> |
 | **v1.0** | Governance maturity | <ul><li>A steering group (maintainers plus a rotating community seat; vendors advise without voting)</li><li>RFC process in active use</li><li>Citation-policy badges</li><li>Yearly "State of Agent Sandboxes" report</li><li>An evaluation of fiscal hosting (e.g. OpenCollective or a foundation)</li></ul> |
@@ -107,9 +101,9 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 
 | Risk | Mitigation |
 |---|---|
-| Accusations of bias | Native SDKs, public data, a disclosed COI, right of reply, and a neutral org (D2) |
+| Accusations of bias | Native SDKs, public data, disclosed credits, and right of reply |
 | Vendor ToS forbids publishing results | ToS check before inclusion; ask for permission in writing and publish the exchange |
-| Costs grow with tracks and regions | Budget guard, disclosed vendor credits, and weekly cadence for expensive workloads |
+| Costs grow with tracks and regions | Budget guard, vendor-given credits, vendor-submitted results for expensive tracks, and weekly cadence for expensive workloads |
 | Maintainer burnout (the TechEmpower lesson) | Small scope, automate everything, vendors maintain their own adapters, and an explicit "not now" list |
 | SDK churn breaks adapters | Pinned SDKs, Renovate PRs, and a daily canary that opens an issue on adapter failure |
 | Numbers go stale or providers pivot | Every number dated, `stale` flag after 14 days, configurations deprecated publicly |

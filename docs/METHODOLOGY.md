@@ -13,7 +13,7 @@
 | **Metric** | One number a benchmark produces, e.g. `resume_ready_ms` or `memory_preserved`. |
 | **Sample** | One measurement of one metric in one iteration. |
 | **Run** | One execution of a set of benchmarks against a set of configurations. It has a `run_id` and a manifest. |
-| **Division** | `default` (stock SDK, documented defaults, self-serve plan) or `optimized` (any documented feature or plan, disclosed). The two are never mixed in one ranking. |
+| **Division** | `default` (stock SDK, documented defaults, publicly available plan), `optimized` (any documented feature or plan, disclosed) or `submitted` (vendor-run, see [GOVERNANCE §7](GOVERNANCE.md#7-vendor-submitted-results)). Divisions are never mixed in one ranking. |
 | **Harness version** | A semver tag of this repo. A **major** bump means numbers are not comparable across versions. |
 
 ## 2. Standard sandbox spec
@@ -108,7 +108,7 @@ Probes: custom OCI image · outbound internet · egress allowlist enforced · ex
    - **Harness errors** (our bug, our expired credentials, our exhausted credits) are excluded, logged, and shown in the run report.
    - The error taxonomy is stored with every failed sample.
 7. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run. Leaked sandboxes are reported.
-8. **Accounts.** Self-serve plans paid for by the project. Any vendor-provided credits or accounts are disclosed in the configuration metadata and cross-checked periodically against an anonymous account ([GOVERNANCE §3](GOVERNANCE.md)).
+8. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. Vendor-provided accounts are cross-checked periodically against a free-tier account ([GOVERNANCE §3](GOVERNANCE.md#3-accounts-and-credits)).
 
 ## 6. Statistics and presentation
 
