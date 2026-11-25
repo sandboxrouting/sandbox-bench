@@ -22,6 +22,7 @@ Beta features are tagged `preview` and kept out of `default`.
 
 - Every configuration runs on the provider's free-tier allowance or on credits the provider gives the project. Each configuration notes which.
 - Credits never affect inclusion or ranking.
+- A provider whose free tier can't run the standard 2 vCPU / 4 GiB size joins once credits are available.
 - Now and then, we re-run provider-given accounts from a plain free-tier account to make sure the numbers match.
 
 ## Adapters
@@ -57,7 +58,7 @@ You're welcome to quote results. Please include:
 
 ## Changing the benchmark
 
-- **New benchmark in an existing track:** a PR with a short design note, and approval from two maintainers.
+- **New benchmark in an existing track:** a PR with a short design note, and approval from one maintainer.
 - **New tracks, scoring changes and timing-boundary changes:** an RFC in `docs/rfcs/`, open for 14 days.
 - **Every accepted change** goes in `CHANGELOG.md`.
 

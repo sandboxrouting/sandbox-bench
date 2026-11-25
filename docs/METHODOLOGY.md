@@ -20,7 +20,7 @@
 
 These settings keep comparisons like for like.
 
-- **Size:** 2 vCPU / 4 GiB RAM / ≥10 GiB disk. Where a provider has fixed shapes, we use the nearest shape at or above it and record the actual shape. Example: Cloudflare `standard-3` is 2 vCPU / 8 GiB.
+- **Size:** 2 vCPU / 4 GiB RAM / ≥10 GiB disk. Where a provider has fixed shapes, we use the nearest shape at or above it and record the actual shape. Example: Cloudflare `standard-3` is 2 vCPU / 8 GiB. A provider joins the benchmark once its account (free tier or donated credits) can run this size. We don't measure undersized configurations.
 - **Images:** two modes, each reported separately.
   - `default-image`: the provider's default or base image. This is what a new user experiences first.
   - `standard-image`: our public image `sandbox-bench/base:<version>`, built from a Dockerfile in this repo (Debian slim, Python 3.12, Node 22, git, build-essential). Each provider registers it as a template or snapshot ahead of time. Template build time is measured separately and excluded from start metrics.
@@ -100,15 +100,16 @@ Probes: custom OCI image · outbound internet · egress allowlist enforced · ex
 
 1. **Runner.** A fixed, dedicated VM in a declared region (v0.1: one US-East runner; v0.2: US-East, EU-West and AP-Southeast). Its spec, region and IP are recorded in each run manifest.
 2. **Interleaving.** Iterations go round-robin across configurations, with the order **shuffled each round**. This spreads time-of-day and network effects evenly, instead of running all of provider A and then all of provider B.
-3. **Iterations.** For latency, n = 30 measured iterations per configuration per run, plus 3 warm-up iterations. Warm-up iterations are recorded and flagged, never silently dropped. For state operations, n = 10 per run. Leaderboards aggregate a **rolling 7-day window**, which gives a few hundred samples per metric.
-4. **Cadence.** v0.1 runs daily; v0.2 runs every 6 hours. Expensive workloads (Terminal-Bench) run weekly.
-5. **Timeouts.** Create, restore, resume and fork time out at 120 s, and exec at 60 s. A timeout is a failure, never a sample capped at 120 s.
-6. **Error attribution.**
+3. **One operation in flight.** Lifecycle and state benchmarks run strictly sequentially: one sandbox operation at a time across the whole runner, so providers never compete for the client's CPU or network. Only the `scale` track runs operations concurrently, by design.
+4. **Iterations.** For latency, n = 30 measured iterations per configuration per run, plus 3 warm-up iterations. Warm-up iterations are recorded and flagged, never silently dropped. For state operations, n = 10 per run. Leaderboards aggregate a **rolling 7-day window**, which gives a few hundred samples per metric.
+5. **Cadence.** v0.1 runs daily; v0.2 runs every 6 hours. Expensive workloads (Terminal-Bench) run weekly.
+6. **Timeouts.** Create, restore, resume and fork time out at 120 s, and exec at 60 s. A timeout is a failure, never a sample capped at 120 s.
+7. **Error attribution.**
    - **Provider errors** (5xx, timeouts, wrong results, rate limits on documented-normal usage) count as failures for the configuration.
    - **Harness errors** (our bug, our expired credentials, our exhausted credits) are excluded, logged, and shown in the run report.
    - The error taxonomy is stored with every failed sample.
-7. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run. Leaked sandboxes are reported.
-8. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. See [GOVERNANCE](GOVERNANCE.md#accounts-and-credits).
+8. **Cleanup.** Every sandbox is tagged `sandbox-bench/<run_id>`, and a reaper destroys leftovers after each run. Leaked sandboxes are reported.
+9. **Accounts.** Each configuration runs on the provider's free-tier allowance or on credits the vendor has given the project. The credit source is recorded in the configuration metadata. See [GOVERNANCE](GOVERNANCE.md#accounts-and-credits).
 
 ## 6. Statistics and presentation
 

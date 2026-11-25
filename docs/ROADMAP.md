@@ -20,7 +20,7 @@ These are the most heavily marketed claims in the sandbox market, and no one has
 - One runner region and daily runs.
 - A static site and raw data in git.
 
-**Launch providers:** E2B, Daytona (container, plus Linux VM if accessible), Modal, Vercel Sandbox, Blaxel, Tensorlake and Morph. All seven have Python SDKs and free-tier credits. Freestyle and Cloudflare join in v0.2 through the TypeScript bridge.
+**Launch providers:** E2B, Daytona (container, plus Linux VM if accessible), Modal, Vercel Sandbox, Blaxel, Tensorlake and Morph. All seven have Python SDKs. Each joins once its free tier or donated credits can run the standard 2 vCPU / 4 GiB size (Tensorlake's free tier, for example, needs credits). Freestyle and Cloudflare join in v0.2 through the TypeScript bridge.
 
 **Harness:** Python 3.12 with `uv` (see [ARCHITECTURE](ARCHITECTURE.md#stack)).
 
