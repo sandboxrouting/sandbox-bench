@@ -31,8 +31,8 @@ providers:
       usd_per_hour: null
       todo: >-
         The pricing page lists no rate for paused or suspended VMs, only storage at
-        $0.000086/GiB-h, and doesn't say how much storage a paused VM bills. Confirm with
-        Freestyle before showing a number (docs/decisions/0007-unknown-prices-stay-unknown.md).
+        $0.000086/GiB-h, and doesn't say how much storage a paused VM bills. Show a number
+        once Freestyle publishes one (docs/decisions/0007-unknown-prices-stay-unknown.md).
       source: https://www.freestyle.sh/pricing
       checked: 2026-11-26
     notes:

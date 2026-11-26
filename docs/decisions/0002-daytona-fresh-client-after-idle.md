@@ -11,7 +11,7 @@ The benchmark creates this gap itself: a Daytona snapshot can take minutes (7.6 
 ## Decision
 After 240 s without a command, `create` and `restore` build a new SDK client (3.5 ms, no network call) for the new sandbox. Nothing is retried. See `STALE_AFTER_S` in `providers/daytona.py`.
 
-The dropped connections are a real bug that users hit, so we report it to Daytona, and remove this workaround once a fixed SDK is pinned.
+The dropped connections are a real Daytona bug that users hit too, not only the benchmark. The workaround is removed once a fixed SDK is pinned.
 
 ## Alternatives
 - **Count the reset as a Daytona failure.** It is the provider's SDK and proxy, and a real user would hit it. But it would make `snapshot-keeps-files` measure connection handling instead of snapshots.

@@ -7,7 +7,7 @@
 The cost columns come from list prices in `pricing/pricing.yaml`, each with a source link and the date it was checked. Freestyle's pricing page gives no rate for a paused VM. It lists storage at $0.000086/GiB-h but doesn't say how much storage a paused VM bills, for example whether its 4 GiB of memory is stored.
 
 ## Decision
-A price the provider doesn't publish is `null` with a `todo:` saying what is missing, and the tables show "?". We ask the provider and fill it in from their answer or their docs, with the source. We are asking Freestyle about paused VMs.
+A price the provider doesn't publish is `null` with a `todo:` saying what is missing, and the tables show "?". It is filled in, with its source, once the provider publishes it. Freestyle's paused price is the open case.
 
 ## Alternatives
 - **Estimate it** (e.g. disk plus memory size times the storage rate). This is a number we made up, presented next to numbers they published.
