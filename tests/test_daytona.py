@@ -15,6 +15,7 @@ from daytona.v0 import (
     DaytonaForbiddenError,
     DaytonaInternalServerError,
     DaytonaNotFoundError,
+    DaytonaRateLimitError,
 )
 from daytona_api_client import SandboxState, SnapshotState
 
@@ -217,6 +218,15 @@ def test_create_after_idle_starts_a_new_client(monkeypatch: pytest.MonkeyPatch) 
 def test_account_failures_raise_account_error(error: Exception) -> None:
     with pytest.raises(AccountError):
         adapter(StubClient(create_error=error)).create(Spec(name="sbx-t-1"))
+
+
+def test_throttling_is_a_provider_failure_but_a_plan_quota_is_ours() -> None:
+    throttled = DaytonaRateLimitError("Rate limit exceeded", status_code=429)
+    with pytest.raises(DaytonaRateLimitError):
+        adapter(StubClient(create_error=throttled)).create(Spec(name="sbx-t-1"))
+    quota = DaytonaRateLimitError("Sandbox quota exceeded", status_code=429)
+    with pytest.raises(AccountError):
+        adapter(StubClient(create_error=quota)).create(Spec(name="sbx-t-1"))
 
 
 @pytest.mark.parametrize(

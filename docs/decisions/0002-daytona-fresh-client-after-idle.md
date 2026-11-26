@@ -1,6 +1,6 @@
 # 0002. Daytona: a fresh SDK client after 240 s idle
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-26
 
 ## Context
@@ -11,9 +11,12 @@ The benchmark creates this gap itself: a Daytona snapshot can take minutes (7.6 
 ## Decision
 After 240 s without a command, `create` and `restore` build a new SDK client (3.5 ms, no network call) for the new sandbox. Nothing is retried. See `STALE_AFTER_S` in `providers/daytona.py`.
 
+The dropped connections are a real bug that users hit, so we report it to Daytona, and remove this workaround once a fixed SDK is pinned.
+
 ## Alternatives
 - **Count the reset as a Daytona failure.** It is the provider's SDK and proxy, and a real user would hit it. But it would make `snapshot-keeps-files` measure connection handling instead of snapshots.
 - **Retry on a reset.** This would break the adapter rule against retries, and it would hide resets everywhere, not just after a gap.
+- **A fresh client before every create and restore.** There's no magic number, but every Start would pay a new connection setup (tens of ms), which makes Daytona look slower than it is.
 - **Keep connections warm with a ping during long operations.** This sends traffic a user wouldn't, inside the clock.
 
 ## Consequences

@@ -36,7 +36,7 @@ docs/                 methodology, roadmap, research
   decisions/          one record per decision, with the alternatives we didn't take
 ```
 
-The harness (everything outside `providers/` and `probes/`) is kept under 1,500 lines. `probes/` also holds the shared probe modules (`guest.py` and the `Context` in `__init__.py`, about 270 lines), which the budget doesn't count ([ADR-0003](docs/decisions/0003-line-budget-excludes-probes.md)). Add shared code there only if probes alone use it.
+The harness is kept under 1,800 lines: everything outside `providers/` and `probes/`, plus the shared probe modules `probes/__init__.py` and `probes/guest.py` ([ADR-0003](docs/decisions/0003-line-budget-counts-shared-probe-code.md)). CI checks it with `scripts/check_budget.py`.
 
 ## Add your provider
 
@@ -93,8 +93,8 @@ After merge, your provider joins the next daily run on our machine. It shows up 
 - **Public API only.** Use your public SDK or REST API, with the SDK version pinned.
 - **Map, don't optimise.** No retries, pre-warming or caching. The harness does all the timing.
 - **Use the harness's helpers.** Poll with `self.wait_until(...)`, and create only resources named from `spec.name` (or `name` for snapshots); that `sbx-` prefix is how cleanup finds them.
-- **Errors.** Raise `AccountError` only for problems on our side (missing key, no credits, a plan limit); those attempts are excluded. Any other exception counts as a provider failure.
-- **Pacing and timeouts.** Set `pacing_s` if your API has a documented rate limit. Timeouts are the same for everyone.
+- **Errors.** Raise `AccountError` only for problems on our side (missing key, no credits, a plan limit); those attempts are excluded. Any other exception counts as a provider failure, including being throttled for request rate ([ADR-0009](docs/decisions/0009-throttling-is-the-providers-failure.md)).
+- **Pacing and timeouts.** Set `pacing_s` from your documented rate limit, with a link to it. Timeouts are the same for everyone.
 
 ## Propose a probe
 

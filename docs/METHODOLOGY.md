@@ -112,8 +112,8 @@ A timeout is a failure, never a capped sample. Any rate-limit pacing happens out
 - **Per-metric tables** add p90, n, success rate, the date window, plan, size, region and API RTT.
 - **Per-provider facts:** each provider gets a plain line generated from data, for example "Pause: not offered. Snapshot: files only, 368 s."
 - **Errors:**
-  - Provider errors (5xx responses, timeouts, wrong results) count as failures.
-  - Our own errors (a harness bug, an expired key, exhausted credits, an account limit) are excluded and listed in the run log.
+  - Provider errors (5xx responses, timeouts, wrong results) count as failures. So does being throttled for request rate (HTTP 429), since we pace calls to the provider's published limit ([ADR-0009](decisions/0009-throttling-is-the-providers-failure.md)).
+  - Our own errors (a harness bug, an expired key, exhausted credits, an account or plan limit) are excluded and listed in the run log.
   - Every failing probe links to its error, the verifier's evidence and the `sbx check` command that reproduces it.
 
 ## 6. Cost
@@ -143,7 +143,7 @@ Every known way these results could mislead, in the four standard categories. Ea
 
 | Threat | What we do | What remains |
 |---|---|---|
-| **"Offered" is our reading of the docs.** A probe is n/a unless the docs claim it, and some claims are indirect. | Every offered probe links the page that claims it. | Freestyle's `fork-isolation-x3` rests on a guide that implies isolation without stating it ([ADR-0005](decisions/0005-freestyle-fork-isolation-offered.md)). A dispute can move a probe either way. |
+| **"Offered" is our reading of the docs.** A probe is n/a unless the docs claim it, and some claims are indirect. | Every offered probe links the page that claims it. | Freestyle's `fork-isolation-x3` rests on a guide that implies isolation without stating it; we're asking Freestyle to state it, and it becomes n/a if they won't ([ADR-0005](decisions/0005-freestyle-fork-isolation-offered.md)). A dispute can move a probe either way. |
 | **The egress check is a sample, not a proof.** | Two targets, by name and by IP, and only a response counts as open ([ADR-0004](decisions/0004-egress-needs-a-response.md)). | Only TCP port 80 over IPv4 is tried. A block that leaves other ports, UDP or IPv6 open still passes. |
 | **Network probes depend on tools in the image.** | `curl`, `wget`, `python3` or `nc`, whichever exists; the tool is in the evidence ([ADR-0008](decisions/0008-network-probes-use-image-tools.md)). | An image without any of them fails the network probes even if its network works. |
 | **"Keeps memory" is tested on one small process.** | One `sh` loop and a 32 MiB `/dev/shm` buffer, checked for identity, content and progress (§3). | Large heaps, many processes, open sockets and GPU state aren't tested. |
@@ -154,8 +154,8 @@ Every known way these results could mislead, in the four standard categories. Ea
 | Threat | What we do | What remains |
 |---|---|---|
 | **The adapter shapes the result.** A slow or wrong mapping makes the provider look slow or broken. | Public SDK or REST API only, pinned versions, no retries or caching, an owner per adapter, and each provider gets its results 7 days before launch (ROADMAP §3). | Where no Python SDK exists, the adapter calls REST directly (Freestyle), and a provider's own SDK might be faster or slower. |
-| **Adapter workarounds.** | Each is a decision record, linked from the code. | Daytona builds a new SDK client after 240 s idle, so a dropped keep-alive connection doesn't fail the next sandbox ([ADR-0002](decisions/0002-daytona-fresh-client-after-idle.md)). |
-| **Errors are sorted by adapters.** An `AccountError` is excluded, anything else fails the provider (§5). | Each adapter maps HTTP status codes and messages, with tests. | The mapping can be wrong. Daytona's adapter counts HTTP 429 (rate limited) as our error, Freestyle's doesn't. An excluded attempt is listed in the run log, so this is visible but not scored. |
+| **Adapter workarounds.** | Each is a decision record, linked from the code. | Daytona builds a new SDK client after 240 s idle, so a dropped keep-alive connection doesn't fail the next sandbox ([ADR-0002](decisions/0002-daytona-fresh-client-after-idle.md)). The underlying bug is being reported to Daytona. |
+| **Errors are sorted by adapters.** An `AccountError` is excluded, anything else fails the provider (§5). | Each adapter maps HTTP status codes and messages, with tests. | The mapping can be wrong, for example when a provider uses HTTP 429 both for throttling (theirs) and for a plan limit (ours) and only the message tells them apart ([ADR-0009](decisions/0009-throttling-is-the-providers-failure.md)). An excluded attempt is listed in the run log, so a wrong exclusion is visible. |
 | **Client-side clocks include the path to the provider.** | API RTT is measured and shown as context, and the runner sits in us-east near each provider's chosen region. | Providers farther from us-east pay more network time on every call. Readiness polls every 0.1 s, so times are coarse to about 0.1 s. |
 | **Pacing, warm-up and pools.** | Pacing is outside the clock. One uncounted warm-up create per provider per run. A free shared pool counts; a billed warm pool doesn't (§1). | A pool-backed Start isn't a cold start, which the start mode column states. |
 

@@ -240,7 +240,8 @@ def test_derived_name_fits_a_slug() -> None:
         (401, "UNAUTHORIZED", True),
         (402, "PAYMENT_REQUIRED", True),
         (403, "FORBIDDEN", True),
-        (429, "LIMIT_EXCEEDED", True),
+        (429, "LIMIT_EXCEEDED", True),  # a plan limit
+        (429, "RATE_LIMITED", False),  # throttling
         (409, "TLS_RULE_LIMIT", True),
         (409, "CONFLICT", False),
         (500, "INTERNAL_ERROR", False),

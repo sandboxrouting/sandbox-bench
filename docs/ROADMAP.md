@@ -48,4 +48,4 @@ One provider per PR, split between the two maintainers. Planned: E2B, Modal, Ver
 | A provider disputes a result | Public verifiers and evidence, a reproduce command on every failing probe, provider notes |
 | Adapters rot as SDKs change | Pinned SDKs, an owner per adapter, the 14-day stale rule |
 | Free credits run out | Small payloads, few attempts per day, credits requested early |
-| Scope creep | A ~1,500-line budget for the harness, and one version for everything |
+| Scope creep | A ~1,800-line budget for the harness ([ADR-0003](decisions/0003-line-budget-counts-shared-probe-code.md)), and one version for everything |

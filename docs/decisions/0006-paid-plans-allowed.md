@@ -1,6 +1,6 @@
 # 0006. Accounts may be pay-as-you-go
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-26
 
 ## Context

@@ -1,6 +1,6 @@
 # 0008. Network probes use tools from the default image
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-26
 
 ## Context

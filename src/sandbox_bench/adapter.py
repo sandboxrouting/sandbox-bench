@@ -37,7 +37,8 @@ class AccountError(Exception):
 
     Attempts that end in an ``AccountError`` are excluded from scores and listed in the run
     log (METHODOLOGY §5). Raise it only for those causes, never for a provider fault: any
-    other exception counts as a provider failure.
+    other exception counts as a provider failure. Being throttled (HTTP 429 for request rate)
+    is the provider's fault, because the harness paces to ``pacing_s`` (ADR-0009).
     """
 
 
@@ -122,8 +123,8 @@ class Adapter[SB, SNAP](ABC):
 
     # ---- pacing ------------------------------------------------------------------------------
     pacing_s: ClassVar[float] = 0.0
-    """Minimum gap between API calls, for providers with a documented rate limit. The
-    harness applies it outside the clock."""
+    """Minimum gap between API calls, set from the provider's documented rate limit. The
+    harness applies it outside the clock, so throttling while it does is a provider failure."""
 
     # ---- required ----------------------------------------------------------------------------
     @abstractmethod

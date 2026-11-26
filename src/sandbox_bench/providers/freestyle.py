@@ -372,6 +372,9 @@ def _error(response: httpx.Response, what: str) -> Exception:
         body = _ErrorBody(message=response.text)
     message = " ".join(body.message.split())[:200]
     status = response.status_code
-    if status in ACCOUNT_STATUSES or any(w in body.code for w in ACCOUNT_CODE_WORDS):
+    throttled = body.code.startswith("RATE")  # RATE_LIMITED is the provider's (ADR-0009)
+    if status in ACCOUNT_STATUSES or (
+        not throttled and any(w in body.code for w in ACCOUNT_CODE_WORDS)
+    ):
         return AccountError(f"{what}: HTTP {status} {body.code}: {message}")
     return FreestyleApiError(status, body.code, message, what)

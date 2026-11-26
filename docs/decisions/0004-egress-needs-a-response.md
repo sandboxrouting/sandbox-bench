@@ -1,6 +1,6 @@
 # 0004. Egress counts as open only if a response comes back
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-26
 
 ## Context
@@ -16,7 +16,8 @@ Live results on 2026-11-26: Daytona blocked (DNS fails, the IP sinkholes), and F
 ## Alternatives
 - **TCP connect only.** It misreads sinkholes, as above.
 - **HTTPS to the pinned file.** This is stricter, but a TLS failure can't tell "blocked" from "a broken CA bundle in the image".
-- **More targets (other ports, UDP, IPv6).** This is closer to "all traffic", but each target adds a way to fail. It's a candidate for a later version.
+- **Add port 443.** A small step toward "all traffic", planned for v0.2.
+- **Ports 80 and 443, plus UDP and IPv6.** Closest to "nothing gets out", but many providers have no IPv6, so telling "blocked" from "doesn't exist" gets complicated.
 
 ## Consequences
 - Only port 80 over TCP and IPv4 is tested. A block that leaves other ports, UDP or IPv6 open still passes. Listed in [METHODOLOGY §9.1](../METHODOLOGY.md#91-construct-validity-do-the-probes-measure-what-they-say).

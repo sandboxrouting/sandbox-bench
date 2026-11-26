@@ -64,8 +64,9 @@ STALE_AFTER_S: Final = 240.0
 """Idle time after which the proxy may have closed the SDK's connections (fine at 245 s,
 reset at 310 s and 340 s in testing, 2026-11-26)."""
 
-_ACCOUNT_STATUS: Final = frozenset({401, 402, 403, 429})
+_ACCOUNT_STATUS: Final = frozenset({401, 402, 403})
 _ACCOUNT_WORDS: Final = ("quota", "credit", "suspended", "limit exceeded", "billing")
+_PLAN_WORDS: Final = ("quota", "credit", "billing")
 _GONE: Final = frozenset({SandboxState.DESTROYED, SandboxState.DESTROYING})
 _SNAPSHOT_FAILED: Final = frozenset({SnapshotState.ERROR, SnapshotState.BUILD_FAILED})
 
@@ -78,6 +79,8 @@ def _is_account_error(exc: Exception) -> bool:
         return False
     status = getattr(exc, "status_code", None)
     message = str(exc).lower()
+    if status == 429 and not any(word in message for word in _PLAN_WORDS):
+        return False  # throttled while the harness paces us: the provider's failure (ADR-0009)
     return status in _ACCOUNT_STATUS or any(word in message for word in _ACCOUNT_WORDS)
 
 
