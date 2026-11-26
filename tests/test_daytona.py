@@ -281,7 +281,7 @@ def test_expose_port_sends_token_for_private_sandbox() -> None:
 
 
 # ---- reap -------------------------------------------------------------------------------------
-@pytest.mark.parametrize("prefix", ["", "s", "sbx", "cc-", "snapvm-"])
+@pytest.mark.parametrize("prefix", ["", "s", "sbx", "cc-", "other-"])
 def test_reap_refuses_foreign_prefixes(prefix: str) -> None:
     client = StubClient(sandboxes=[StubSandbox("cc-x")])
     with pytest.raises(ValueError, match="refusing"):
@@ -291,10 +291,10 @@ def test_reap_refuses_foreign_prefixes(prefix: str) -> None:
 
 def test_reap_deletes_only_matching_resources() -> None:
     mine, other_run = StubSandbox("sbx-r1-a"), StubSandbox("sbx-r2-a")
-    foreign, dying = StubSandbox("9e63e599"), StubSandbox("sbx-r1-b", SandboxState.DESTROYING)
+    foreign, dying = StubSandbox("1f2e3d4c"), StubSandbox("sbx-r1-b", SandboxState.DESTROYING)
     client = StubClient(sandboxes=[mine, other_run, foreign, dying])
     client.snapshot.pages = [
-        [StubSnapshot("snapvm-x"), StubSnapshot("sbx-r1-snap"), StubSnapshot("daytona-medium")],
+        [StubSnapshot("other-x"), StubSnapshot("sbx-r1-snap"), StubSnapshot("daytona-medium")],
         [
             StubSnapshot("sbx-r1-old", SnapshotState.REMOVING),
             StubSnapshot("sbx-r1-snap2"),
