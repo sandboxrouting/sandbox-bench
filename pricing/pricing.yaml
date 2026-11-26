@@ -1,0 +1,41 @@
+# List prices for one sandbox at the standard size (METHODOLOGY §6).
+# Every rate has the page it comes from and the date someone checked it there.
+# usd_per_hour: null means there is no price to show; say why in `note` (not offered)
+# or `todo` (offered, but no list price found yet). Never fill in a guess.
+size: {vcpu: 2, memory_gib: 4}
+
+providers:
+  daytona:
+    running:
+      usd_per_hour: 0.1656
+      basis: 2 × $0.0504/vCPU-h + 4 × $0.0162/GiB-h
+      source: https://www.daytona.io/pricing
+      checked: 2026-11-25
+    paused:
+      usd_per_hour: null
+      note: pause isn't offered on containers
+      source: https://www.daytona.io/pricing
+      checked: 2026-11-25
+    notes:
+      - Billed per second.
+      - Storage $0.000108/GiB-h, first 5 GiB free.
+      - $200 of free compute with pay-as-you-go.
+
+  freestyle:
+    running:
+      usd_per_hour: 0.13224
+      basis: 2 × $0.04032/vCPU-h + 4 × $0.0129/GiB-h
+      source: https://www.freestyle.sh/pricing
+      checked: 2026-11-26
+    paused:
+      usd_per_hour: null
+      todo: >-
+        The pricing page lists no rate for paused or suspended VMs, only storage at
+        $0.000086/GiB-h, and doesn't say how much storage a paused VM bills. Confirm with
+        Freestyle before showing a number (docs/decisions/0007-unknown-prices-stay-unknown.md).
+      source: https://www.freestyle.sh/pricing
+      checked: 2026-11-26
+    notes:
+      - Free each month 200 vCPU-h, 400 GiB-h memory and 60,000 GiB-h storage; hard stops on the free plan.
+      - Paid plans $50 or $500 a month, with usage over the fee billed.
+      - Storage $0.000086/GiB-h, data transfer $0.02/GB.
