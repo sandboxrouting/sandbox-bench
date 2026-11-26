@@ -1,0 +1,12 @@
+[Unit]
+Description=Run sandbox-bench once a day
+
+[Timer]
+# 06:00 UTC daily. Persistent catches up after downtime; the jitter avoids hitting
+# providers at the exact top of the hour every day.
+OnCalendar=*-*-* 06:00:00 UTC
+Persistent=true
+RandomizedDelaySec=15min
+
+[Install]
+WantedBy=timers.target
