@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 676" width="1200" height="676" role="img" aria-labelledby="t d">
+<title id="t">The memory check</title>
+<desc id="d">Before the action the harness starts an sh counter loop and a 32 MiB /dev/shm buffer, and records PID, start time, command line, buffer hash and the counter value v0. After pause and resume, snapshot and restore, or fork, it passes only if the same process is running, the buffer hash matches, and two counter reads at least 2 seconds apart show v0 &lt;= r1 &lt; r2. A restarted sandbox fails all three.</desc>
+<defs><marker id="a-ink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#12272B"/></marker><marker id="a-alive" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#0A7A5C"/></marker><marker id="a-act" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#4A54C4"/></marker><marker id="a-fail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#BB3226"/></marker><marker id="a-faint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#7E9193"/></marker></defs>
+<circle cx="14" cy="22" r="14" fill="none" stroke="#12272B" stroke-width="1.5"/>
+<text x="14" y="28" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="17.6" font-weight="600" fill="#12272B" text-anchor="middle">1</text>
+<text x="38" y="29" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="23.1" font-weight="600" fill="#12272B" text-anchor="start">Before the action</text>
+<circle cx="386" cy="22" r="14" fill="none" stroke="#12272B" stroke-width="1.5"/>
+<text x="386" y="28" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="17.6" font-weight="600" fill="#12272B" text-anchor="middle">2</text>
+<text x="410" y="29" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="23.1" font-weight="600" fill="#12272B" text-anchor="start">The action</text>
+<circle cx="806" cy="22" r="14" fill="none" stroke="#12272B" stroke-width="1.5"/>
+<text x="806" y="28" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="17.6" font-weight="600" fill="#12272B" text-anchor="middle">3</text>
+<text x="830" y="29" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="23.1" font-weight="600" fill="#12272B" text-anchor="start">After: all three must hold</text>
+<text x="410" y="56" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#4A54C4" text-anchor="start">pause → resume, snapshot → restore,</text>
+<text x="410" y="78" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#4A54C4" text-anchor="start">or fork (checked in the child)</text>
+<rect x="0" y="104" width="340" height="520" rx="10" fill="#FFFFFF" stroke="#C2CFCA" stroke-width="1.5"/>
+<text x="22" y="140" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="400" fill="#4F6467" text-anchor="start">Inside the sandbox, start</text>
+<rect x="22" y="154" width="296" height="92" rx="6" fill="#F2F6F4" stroke="#C2CFCA" stroke-width="1"/>
+<text x="36" y="182" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="400" fill="#12272B" text-anchor="start">sh loop, i in memory:</text>
+<text x="36" y="206" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="400" fill="#0A7A5C" text-anchor="start">i=$((i+1)); sleep 0.5</text>
+<text x="36" y="230" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">→ writes i to ~/.sbx/</text>
+<rect x="22" y="276" width="296" height="66" rx="6" fill="#F2F6F4" stroke="#C2CFCA" stroke-width="1"/>
+<text x="36" y="304" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="400" fill="#12272B" text-anchor="start">32 MiB random bytes</text>
+<text x="36" y="328" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">→ /dev/shm (RAM)</text>
+<text x="22" y="380" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="400" fill="#4F6467" text-anchor="start">Then record</text>
+<text x="22" y="416" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#12272B" text-anchor="start">PID</text>
+<text x="318" y="416" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="500" fill="#12272B" text-anchor="end">2008</text>
+<line x1="22" y1="430" x2="318" y2="430" stroke="#DCE5E1" stroke-width="1"/>
+<text x="22" y="456" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#12272B" text-anchor="start">start time</text>
+<text x="318" y="456" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="500" fill="#12272B" text-anchor="end">28250874</text>
+<line x1="22" y1="470" x2="318" y2="470" stroke="#DCE5E1" stroke-width="1"/>
+<text x="22" y="496" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#12272B" text-anchor="start">command line</text>
+<text x="318" y="496" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="500" fill="#12272B" text-anchor="end">sh -c …</text>
+<line x1="22" y1="510" x2="318" y2="510" stroke="#DCE5E1" stroke-width="1"/>
+<text x="22" y="536" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#12272B" text-anchor="start">/dev/shm sha256</text>
+<text x="318" y="536" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="500" fill="#12272B" text-anchor="end">2c61e18d…</text>
+<line x1="22" y1="550" x2="318" y2="550" stroke="#DCE5E1" stroke-width="1"/>
+<text x="22" y="576" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#12272B" text-anchor="start">counter v0</text>
+<text x="318" y="576" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="500" fill="#12272B" text-anchor="end">1</text>
+<rect x="372" y="104" width="828" height="248" rx="10" fill="#FFFFFF" stroke="#0A7A5C" stroke-width="1.5"/>
+<rect x="372" y="104" width="6" height="248" rx="3" fill="#0A7A5C"/>
+<text x="396" y="138" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="20.9" font-weight="600" fill="#0A7A5C" text-anchor="start">Same process kept: pass</text>
+<line x1="396" y1="312" x2="760" y2="312" stroke="#C2CFCA" stroke-width="1.5"/>
+<text x="760" y="338" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="400" fill="#7E9193" text-anchor="end">time</text>
+<rect x="520" y="160" width="70" height="152" fill="#E7E9F8"/>
+<text x="555.0" y="182" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#4A54C4" text-anchor="middle">action</text>
+<polyline points="396,304 412,304 412,297 412,297 428,297 428,290 428,290 444,290 444,283 444,283 460,283 460,276 460,276 476,276 476,269 476,269 492,269 492,262 492,262 508,262 508,255 520,255" fill="none" stroke="#0A7A5C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="506" cy="255" r="5" fill="#12272B"/>
+<text x="506" y="241" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#12272B" text-anchor="middle">v0</text>
+<line x1="520" y1="255" x2="590" y2="255" fill="none" stroke="#0A7A5C" stroke-width="2.5" stroke-dasharray="1 6" stroke-linecap="round"/>
+<polyline points="590,255 606,255 606,249.4 606,249.4 622,249.4 622,243.8 622,243.8 638,243.8 638,238.20000000000002 638,238.20000000000002 654,238.20000000000002 654,232.60000000000002 654,232.60000000000002 670,232.60000000000002 670,227.00000000000003 670,227.00000000000003 686,227.00000000000003 686,221.40000000000003 686,221.40000000000003 702,221.40000000000003 702,215.80000000000004 702,215.80000000000004 718,215.80000000000004 718,210.20000000000005 718,210.20000000000005 734,210.20000000000005 734,204.60000000000005 734,204.60000000000005 750,204.60000000000005 750,199.00000000000006" fill="none" stroke="#0A7A5C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="646" cy="238.2" r="5" fill="#12272B"/>
+<text x="646" y="224.2" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#12272B" text-anchor="middle">r1</text>
+<circle cx="742" cy="204.6" r="5" fill="#12272B"/>
+<text x="742" y="190.6" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#12272B" text-anchor="middle">r2</text>
+<path d="M646,290 v6 h96 v-6" fill="none" stroke="#4F6467" stroke-width="1.5"/>
+<text x="694.0" y="314" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#4F6467" text-anchor="middle">≥ 2 s</text>
+<line x1="778" y1="124" x2="778" y2="332" stroke="#DCE5E1" stroke-width="1.5"/>
+<circle cx="812" cy="152" r="12" fill="#0A7A5C"/><path d="M806,152 l4.5,4.5 l8,-9" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="836" y="158" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">Same PID, start time, cmdline</text>
+<text x="836" y="182" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">2008, 28250874 both times</text>
+<circle cx="812" cy="218" r="12" fill="#0A7A5C"/><path d="M806,218 l4.5,4.5 l8,-9" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="836" y="224" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">Same /dev/shm hash</text>
+<text x="836" y="248" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">2c61e18d… = 2c61e18d…</text>
+<circle cx="812" cy="284" r="12" fill="#0A7A5C"/><path d="M806,284 l4.5,4.5 l8,-9" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="836" y="290" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">Still counting: v0 ≤ r1 &lt; r2</text>
+<text x="836" y="314" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">1 ≤ 4 &lt; 9</text>
+<rect x="372" y="376" width="828" height="248" rx="10" fill="#FFFFFF" stroke="#BB3226" stroke-width="1.5"/>
+<rect x="372" y="376" width="6" height="248" rx="3" fill="#BB3226"/>
+<text x="396" y="410" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="20.9" font-weight="600" fill="#BB3226" text-anchor="start">Sandbox restarted: fail</text>
+<line x1="396" y1="584" x2="760" y2="584" stroke="#C2CFCA" stroke-width="1.5"/>
+<text x="760" y="610" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="400" fill="#7E9193" text-anchor="end">time</text>
+<rect x="520" y="432" width="70" height="152" fill="#E7E9F8"/>
+<text x="555.0" y="454" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#4A54C4" text-anchor="middle">action</text>
+<polyline points="396,576 412,576 412,569 412,569 428,569 428,562 428,562 444,562 444,555 444,555 460,555 460,548 460,548 476,548 476,541 476,541 492,541 492,534 492,534 508,534 508,527 520,527" fill="none" stroke="#0A7A5C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="506" cy="527" r="5" fill="#12272B"/>
+<text x="506" y="513" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#12272B" text-anchor="middle">v0</text>
+<line x1="590" y1="527" x2="750" y2="527" stroke="#BB3226" stroke-width="2.5" stroke-dasharray="7 6"/>
+<circle cx="646" cy="527" r="5" fill="#BB3226"/>
+<text x="646" y="513" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#BB3226" text-anchor="middle">r1</text>
+<circle cx="742" cy="527" r="5" fill="#BB3226"/>
+<text x="742" y="513" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="600" fill="#BB3226" text-anchor="middle">r2</text>
+<text x="694.0" y="487" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#BB3226" text-anchor="middle">stale counter file</text>
+<path d="M646,562 v6 h96 v-6" fill="none" stroke="#4F6467" stroke-width="1.5"/>
+<text x="694.0" y="586" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#4F6467" text-anchor="middle">≥ 2 s</text>
+<line x1="778" y1="396" x2="778" y2="604" stroke="#DCE5E1" stroke-width="1.5"/>
+<circle cx="812" cy="424" r="12" fill="#BB3226"/><path d="M807,419 l10,10 M817,419 l-10,10" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+<text x="836" y="430" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">New process start time</text>
+<text x="836" y="454" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">a fresh boot, or no process</text>
+<circle cx="812" cy="490" r="12" fill="#BB3226"/><path d="M807,485 l10,10 M817,485 l-10,10" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+<text x="836" y="496" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">/dev/shm is empty</text>
+<text x="836" y="520" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">no buffer, no hash to match</text>
+<circle cx="812" cy="556" r="12" fill="#BB3226"/><path d="M807,551 l10,10 M817,551 l-10,10" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+<text x="836" y="562" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="19.8" font-weight="500" fill="#12272B" text-anchor="start">Not counting: r1 = r2</text>
+<text x="836" y="586" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#4F6467" text-anchor="start">only the old counter file left</text>
+<text x="0" y="664" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="400" fill="#7E9193" text-anchor="start">Pass-lane values are from a real attempt: freestyle, pause-keeps-memory, run 20261126-120712-d541.</text>
+</svg>

@@ -23,7 +23,7 @@ One provider per PR, split between the two maintainers. Planned: E2B, Modal, Ver
 - the adapter file is complete and lists every offered probe with a docs link;
 - `sbx check` passes, with its table in the PR;
 - the provider's terms allow publishing benchmark results;
-- the account runs 2 vCPU / 4 GiB on its free tier or on credits from the provider.
+- the account runs 2 vCPU / 4 GiB on a public plan (free tier, credits or pay-as-you-go), named in its row ([ADR-0006](decisions/0006-paid-plans-allowed.md)).
 
 ## 3. Launch
 

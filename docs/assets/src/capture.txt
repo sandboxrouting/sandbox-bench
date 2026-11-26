@@ -1,0 +1,19 @@
+$ sbx check freestyle
+wrote results/2026/11/26/20261126-120712-d541.json
+**freestyle (vm)**, run `20261126-120712-d541`
+
+| Probe                 | Verified | Outcome | Median                        |
+|-----------------------|----------|---------|-------------------------------|
+| create-exec           | 1/1      | pass    | Start 0.8 s, Exec 0.2 s       |
+| file-roundtrip        | 1/1      | pass    |                               |
+| internet              | 1/1      | pass    |                               |
+| egress-block          | 1/1      | pass    |                               |
+| exposed-port          | 1/1      | pass    |                               |
+| pause-keeps-files     | 1/1      | pass    | Resume 1.6 s, Pause 0.4 s     |
+| pause-keeps-memory    | 1/1      | pass    |                               |
+| snapshot-keeps-files  | 1/1      | pass    | Restore 0.8 s, Snapshot 0.5 s |
+| snapshot-keeps-memory | 1/1      | pass    |                               |
+| fork-keeps-memory     | 1/1      | pass    | Fork 3.4 s                    |
+| fork-isolation-x3     | 1/1      | pass    |                               |
+
+Raw counts from this run. The leaderboard counts a probe as passing at 9 of its last 10 attempts.

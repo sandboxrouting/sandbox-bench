@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.svg">
+  <img src="docs/assets/hero-light.svg" alt="sandbox-bench. Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast? A process counter keeps rising through pause and resume, snapshot and restore, and a fork, where parent and child both still run pid 2008.">
+</picture>
+
 # sandbox-bench
 
 **Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast?**
@@ -29,6 +34,13 @@ A probe passes when at least 9 of its last 10 attempts succeed. A provider's sco
 
 Each daily run makes 5 attempts per probe, so "the last 10" covers about two days. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-a-run-works-dark.svg">
+  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1: once a day a systemd timer on one machine in us-east runs sbx run, and the adapters drive each provider's 2 vCPU / 4 GiB sandboxes through 5 attempts of every probe, shuffled, one operation in flight. 2: the raw run record goes to a separate results repo, append-only. 3: sbx report scores all runs. 4: the leaderboard tables are committed and pushed.">
+</picture>
+
+*How a daily run reaches the leaderboard. The machine's setup is in [RUNNER](docs/RUNNER.md).*
+
 ## The probes (v0.1)
 
 | Probe | Passes when | Shows up as |
@@ -45,27 +57,43 @@ Each daily run makes 5 attempts per probe, so "the last 10" covers about two day
 | `fork-keeps-memory` | A fork of a running sandbox has the parent's process, still counting | Fork (time to the fork's first command), Keeps memory on: fork |
 | `fork-isolation-x3` | 3 forks run, and a file written in one is invisible to the others | |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/memory-check-dark.svg">
+  <img src="docs/assets/memory-check-light.svg" alt="The memory check. Before the action, an sh loop counts in memory and writes i to a file every 0.5 s, 32 MiB of random bytes sit in /dev/shm, and the harness records PID, start time, command line, the buffer's hash and the counter v0. After pause and resume, snapshot and restore, or a fork, it passes only if the same process is running, the hash matches, and two reads at least 2 s apart show v0 ≤ r1 < r2. A restarted sandbox fails: new start time, empty /dev/shm, counter not rising.">
+</picture>
+
+*The memory check behind the three `-keeps-memory` probes ([methodology §3](docs/METHODOLOGY.md#3-the-memory-check)).*
+
 Got an idea for a probe? [Propose it](CONTRIBUTING.md#propose-a-probe), especially for the feature you're proudest of.
 
 ## Run it yourself
 
-*Coming with v0.1:*
+From a checkout (a PyPI release comes with v0.1):
 
 ```bash
-uv tool install sandbox-bench
-sbx check daytona                                # every probe, with your own key
-sbx check freestyle --probe pause-keeps-memory   # just one
+uv sync
+uv run sbx check fake                                   # offline: try the harness, no account
+uv run sbx check daytona                                # every probe, with your own key
+uv run sbx check freestyle --probe pause-keeps-memory   # just one
+uv run sbx run --providers daytona,freestyle --out runs # a full run, as the daily job does it
+uv run sbx report runs --out board                      # score run records into tables
 ```
+
+Keys come from environment variables only, e.g. `DAYTONA_API_KEY`.
+
+<img src="docs/assets/sbx-check-freestyle.svg" alt="Terminal: sbx check freestyle writes its run record, then prints a table where all 11 probes pass 1/1, with medians Start 0.8 s, Exec 0.2 s, Resume 1.6 s, Pause 0.4 s, Restore 0.8 s, Snapshot 0.5 s and Fork 3.4 s.">
+
+*Real output from a Freestyle run on 2026-11-26.*
 
 Results you produce are yours to compare. The published tables come only from our runner.
 
 ## Add your provider
 
-1. Copy `providers/_template.py` to `providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
+1. Copy `src/sandbox_bench/providers/_template.py` to `src/sandbox_bench/providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
 2. Run `sbx check <you>` with your own key, and paste its table into a PR.
 3. After merge, we run your provider daily from our machine, on your free tier or on credits you give the project. It appears on the leaderboard once each probe has 10 attempts.
 
-The template ships with the harness ([roadmap](docs/ROADMAP.md), step F5). Until then, open an issue and we'll put you in the queue. Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
+Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
 
 ## Contribute
 
@@ -88,6 +116,8 @@ There are more than 15 sandbox providers for AI agents, and the features agents 
 ## Docs
 
 - [Methodology](docs/METHODOLOGY.md): probes, clock boundaries and scoring, on one page
+- [Threats to validity](docs/METHODOLOGY.md#9-threats-to-validity): every known way these results could mislead
+- [Decisions](docs/decisions/README.md): each judgement call, with the alternatives we didn't take
 - [Contributing](CONTRIBUTING.md): add a provider, a probe or a fix
 - [Roadmap](docs/ROADMAP.md): what's being built and what's next
 - [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md)

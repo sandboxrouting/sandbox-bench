@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 506" width="1200" height="506" role="img" aria-labelledby="t d">
+<title id="t">How a run works</title>
+<desc id="d">Once a day a systemd timer on one machine in us-east runs sbx run: adapters drive each provider's sandboxes through 5 attempts of every offered probe. The raw run record is written to a separate results repo, sbx report scores it, and the leaderboard tables are committed and pushed.</desc>
+<defs><marker id="a-ink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#E1EBE7"/></marker><marker id="a-alive" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#43D19E"/></marker><marker id="a-act" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#9AA2F7"/></marker><marker id="a-fail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#F2705F"/></marker><marker id="a-faint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1,1.2 L9,5 L1,8.8 Z" fill="#6E8280"/></marker></defs>
+<text x="0" y="22" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="17.6" font-weight="500" fill="#6E8280" text-anchor="start">Once a day, from one machine</text>
+<rect x="0" y="40" width="290" height="196" rx="10" fill="#141F21" stroke="#2D3E3F" stroke-width="1.5"/>
+<text x="22" y="76" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22.0" font-weight="600" fill="#E1EBE7" text-anchor="start">Runner</text>
+<text x="22" y="106" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#9AACA9" text-anchor="start">one fixed VM in us-east</text>
+<text x="22" y="132" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#9AACA9" text-anchor="start">systemd timer, 06:00 UTC</text>
+<rect x="22" y="152" width="246" height="62" rx="6" fill="#0F1719" stroke="#2D3E3F" stroke-width="1"/>
+<text x="36" y="178" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17.6" font-weight="600" fill="#E1EBE7" text-anchor="start">sbx run</text>
+<text x="36" y="200" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="start">5 attempts per probe</text>
+<rect x="400" y="40" width="280" height="196" rx="10" fill="#141F21" stroke="#2D3E3F" stroke-width="1.5"/>
+<text x="422" y="76" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22.0" font-weight="600" fill="#E1EBE7" text-anchor="start">Adapters</text>
+<text x="422" y="106" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#9AACA9" text-anchor="start">one per provider</text>
+<rect x="422" y="124" width="236" height="28" rx="5" fill="#0F1719" stroke="#2D3E3F" stroke-width="1"/>
+<text x="434" y="143" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#E1EBE7" text-anchor="start">daytona.py</text>
+<rect x="422" y="158" width="236" height="28" rx="5" fill="#0F1719" stroke="#2D3E3F" stroke-width="1"/>
+<text x="434" y="177" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#E1EBE7" text-anchor="start">freestyle.py</text>
+<rect x="422" y="192" width="236" height="28" rx="5" fill="#0F1719" stroke="#2D3E3F" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="434" y="211" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#6E8280" text-anchor="start">&lt;you&gt;.py</text>
+<rect x="830" y="40" width="370" height="196" rx="10" fill="#141F21" stroke="#2D3E3F" stroke-width="1.5"/>
+<text x="852" y="76" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22.0" font-weight="600" fill="#E1EBE7" text-anchor="start">Providers</text>
+<text x="852" y="106" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#9AACA9" text-anchor="start">every sandbox 2 vCPU / 4 GiB</text>
+<rect x="852" y="124" width="104" height="90" rx="8" fill="#0F1719" stroke="#43D19E" stroke-width="1.5"/>
+<text x="904" y="150" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#E1EBE7" text-anchor="middle">Daytona</text>
+<polyline points="870,200 887,200 887,192 887,192 904,192 904,184 904,184 921,184 921,176 921,176 938,176 938,168" fill="none" stroke="#43D19E" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="966" y="124" width="104" height="90" rx="8" fill="#0F1719" stroke="#43D19E" stroke-width="1.5"/>
+<text x="1018" y="150" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#E1EBE7" text-anchor="middle">Freestyle</text>
+<polyline points="984,200 1001,200 1001,192 1001,192 1018,192 1018,184 1018,184 1035,184 1035,176 1035,176 1052,176 1052,168" fill="none" stroke="#43D19E" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="1080" y="124" width="104" height="90" rx="8" fill="#0F1719" stroke="#2D3E3F" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="1132" y="150" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="500" fill="#6E8280" text-anchor="middle">…</text>
+<line x1="296" y1="128" x2="394" y2="128" stroke="#E1EBE7" stroke-width="2" marker-end="url(#a-ink)"/>
+<line x1="394" y1="150" x2="296" y2="150" stroke="#6E8280" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#a-faint)"/>
+<text x="345.0" y="114" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="500" fill="#E1EBE7" text-anchor="middle">probes</text>
+<text x="345.0" y="172" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="middle">timings</text>
+<line x1="686" y1="128" x2="824" y2="128" stroke="#E1EBE7" stroke-width="2" marker-end="url(#a-ink)"/>
+<line x1="824" y1="150" x2="686" y2="150" stroke="#6E8280" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#a-faint)"/>
+<text x="755.0" y="114" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="500" fill="#E1EBE7" text-anchor="middle">pause, fork…</text>
+<text x="755.0" y="172" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="middle">responses</text>
+<circle cx="345" cy="88" r="13" fill="#0F1719" stroke="#E1EBE7" stroke-width="1.5"/>
+<text x="345" y="93.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="600" fill="#E1EBE7" text-anchor="middle">1</text>
+<text x="755" y="96" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="500" fill="#E1EBE7" text-anchor="middle">create, exec,</text>
+<text x="408" y="264" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="400" fill="#9AACA9" text-anchor="start">Probes run shuffled, one operation in flight.</text>
+<text x="408" y="286" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="400" fill="#9AACA9" text-anchor="start">A failing provider is a result: the run carries on.</text>
+<rect x="0" y="312" width="452" height="190" rx="10" fill="#141F21" stroke="#2D3E3F" stroke-width="1.5"/>
+<text x="22" y="348" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22.0" font-weight="600" fill="#E1EBE7" text-anchor="start">Results repo</text>
+<text x="22" y="376" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="18.7" font-weight="400" fill="#9AACA9" text-anchor="start">raw run records, append-only, never edited</text>
+<rect x="22" y="396" width="408" height="84" rx="6" fill="#0F1719" stroke="#2D3E3F" stroke-width="1"/>
+<text x="36" y="424" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#9AACA9" text-anchor="start">runs/2026/11/26/</text>
+<text x="54" y="448" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="500" fill="#E1EBE7" text-anchor="start">20261126-120712-d541.json</text>
+<text x="54" y="470" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15.4" font-weight="400" fill="#6E8280" text-anchor="start">… one RunRecord per run</text>
+<rect x="552" y="362" width="220" height="90" rx="10" fill="#141F21" stroke="#9AA2F7" stroke-width="1.5"/>
+<text x="662" y="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="18.7" font-weight="600" fill="#9AA2F7" text-anchor="middle">sbx report</text>
+<text x="662" y="426" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16.5" font-weight="400" fill="#9AA2F7" text-anchor="middle">runs --out board</text>
+<rect x="900" y="312" width="300" height="190" rx="10" fill="#141F21" stroke="#2D3E3F" stroke-width="1.5"/>
+<text x="922" y="348" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22.0" font-weight="600" fill="#E1EBE7" text-anchor="start">Leaderboard</text>
+<text x="922" y="376" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="start">board/leaderboard.md</text>
+<text x="922" y="398" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="start">board/results.json</text>
+<rect x="922" y="420" width="16" height="14" rx="3" fill="#6E8280" opacity="0.5"/>
+<rect x="946" y="420" width="210" height="14" rx="3" fill="#43D19E" opacity="0.9"/>
+<rect x="922" y="442" width="16" height="14" rx="3" fill="#6E8280" opacity="0.5"/>
+<rect x="946" y="442" width="168" height="14" rx="3" fill="#2D3E3F" opacity="1"/>
+<rect x="922" y="464" width="16" height="14" rx="3" fill="#6E8280" opacity="0.5"/>
+<rect x="946" y="464" width="120" height="14" rx="3" fill="#2D3E3F" opacity="1"/>
+<line x1="150" y1="236" x2="150" y2="306" stroke="#E1EBE7" stroke-width="2" marker-end="url(#a-ink)"/>
+<circle cx="150" cy="272" r="13" fill="#0F1719" stroke="#E1EBE7" stroke-width="1.5"/>
+<text x="150" y="277.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="600" fill="#E1EBE7" text-anchor="middle">2</text>
+<text x="176" y="278" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="500" fill="#E1EBE7" text-anchor="start">raw run record</text>
+<line x1="458" y1="407" x2="546" y2="407" stroke="#E1EBE7" stroke-width="2" marker-end="url(#a-ink)"/>
+<circle cx="502" cy="382" r="13" fill="#0F1719" stroke="#E1EBE7" stroke-width="1.5"/>
+<text x="502" y="387.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="600" fill="#E1EBE7" text-anchor="middle">3</text>
+<text x="502" y="440" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="middle">all runs</text>
+<line x1="778" y1="407" x2="894" y2="407" stroke="#E1EBE7" stroke-width="2" marker-end="url(#a-ink)"/>
+<circle cx="836" cy="382" r="13" fill="#0F1719" stroke="#E1EBE7" stroke-width="1.5"/>
+<text x="836" y="387.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16.5" font-weight="600" fill="#E1EBE7" text-anchor="middle">4</text>
+<text x="836" y="440" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.4" font-weight="400" fill="#9AACA9" text-anchor="middle">commit, push</text>
+</svg>
