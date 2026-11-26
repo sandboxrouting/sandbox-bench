@@ -2,7 +2,7 @@
 
 > Snapshot taken **2026-11-24**. This market changes month to month, so treat every number here as dated.
 > Vendor claims are marked *claimed*. Things we could not confirm are marked *unverified*.
-> This file feeds [VISION](../VISION.md), [METHODOLOGY](../METHODOLOGY.md) and [GOVERNANCE](../GOVERNANCE.md).
+> Background for the [README](../../README.md) and the [methodology](../METHODOLOGY.md).
 
 ## 1. Existing sandbox benchmarks and comparisons
 
@@ -58,7 +58,7 @@ Feature lists: [awesome-ai-sandboxes](https://github.com/tizkovatereza/awesome-a
 
 **Structural facts that affect the design:**
 - **ComputeSDK is not a provider.** It is an MIT-licensed abstraction and router over E2B, Modal, Daytona, Vercel and others. It also runs the most visible competing benchmark. We list it under "related projects", not as a provider.
-- **Daytona went closed source** in June 2026. It has *several sandbox types* (container, Linux VM, Windows VM, macOS) with different feature sets: containers can't fork or take memory snapshots. **The unit we rank must therefore be a provider *configuration*, not a provider.**
+- **Daytona went closed source** in June 2026. It has *several sandbox types* (container, Linux VM, Windows VM, macOS) with different feature sets: containers can't fork or take memory snapshots. **So each row is a provider *and product*, e.g. "Daytona (container)", not just a provider.**
 - **Runloop may be winding down** (*unverified*: one third-party source cites end of support on 2026-11-13). Confirm before integrating.
 - **CodeSandbox SDK is legacy.** It is being replaced by Together's `together-sandbox`, which is sales-gated.
 - New entrants in 2026: AWS Lambda MicroVMs, Baseten Sandboxes, Upstash Box, Google Agent Compute Engine (preview), GKE Agent Sandbox, DigitalOcean Managed Agents (preview), Novita.
@@ -79,7 +79,7 @@ Feature lists: [awesome-ai-sandboxes](https://github.com/tizkovatereza/awesome-a
 | Northflank | Kata / gVisor | Pause only | ? | Yes | No | ? | 0.067 |
 | Fly Sprites | Firecracker | Filesystem checkpoints | ? | ? | No | ? | 0.16 |
 
-\* List price converted to a 100% CPU wall-clock hour on 2026-11-24. These figures are **not comparable without the caveats in [METHODOLOGY §7](../METHODOLOGY.md#7-cost)**: active-CPU billing, fixed CPU:RAM ratios, platform fees, and how a "core" is defined. `?` means unverified.
+\* List price converted to a 100% CPU wall-clock hour on 2026-11-24. These figures are **not comparable without the caveats in [METHODOLOGY §6](../METHODOLOGY.md#6-cost)**: active-CPU billing, fixed CPU:RAM ratios, platform fees, and how a "core" is defined. `?` means unverified.
 
 **Near-universal capabilities (good for the first release):** create, exec and destroy via SDK. A Python or TS SDK. File I/O. Custom OCI images. Outbound internet. Preview URLs. Per-second billing. Filesystem snapshot to a new sandbox.
 

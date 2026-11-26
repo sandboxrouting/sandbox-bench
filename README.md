@@ -1,58 +1,91 @@
 # sandbox-bench
 
-**How fast does your sandbox really start? Does it still remember what it was doing after a pause? Can it fork itself ten times without breaking a sweat?**
+**Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast?**
 
-sandbox-bench is an open benchmark for the cloud sandboxes AI agents run in. It drives E2B, Daytona, Modal, Vercel, Blaxel, Tensorlake, Morph and more through their own SDKs, puts every one through the same probes and speed races, and publishes the results as a live leaderboard. The raw data sits right here in the repo.
+sandbox-bench checks every day, with the same probes for every provider. No paid placement. Measured from one machine in us-east. Raw data in git.
 
-> 🚧 **Pre-launch.** v0.1 is under construction. See the [roadmap](docs/ROADMAP.md).
+> 🚧 **Pre-launch.** v0.1 is being built. See the [roadmap](docs/ROADMAP.md).
 
-## How it works
+## The leaderboard
 
-**1. The probe suite: what can it do?**
-Every sandbox faces the same versioned set of pass/fail **probes**, each judged by an automated verifier. The main leaderboard ranks providers by how many they pass.
+*As of `<date>` · runner in us-east · every sandbox 2 vCPU / 4 GiB · illustrative numbers until the first run*
 
-| Category | Probes in `core-v0.1` |
-|---|---|
-| **Lifecycle** | create → exec · 10 MiB file round-trip · runs our pinned toolset · survives 1 hour |
-| **State** | snapshot keeps files / **memory** · pause keeps files / **memory** · fork keeps **memory** · 10 forks stay isolated |
-| **Environment** | builds from a Dockerfile · internet · egress block enforced · exposed port reachable · Docker inside |
-| **Specialized** *(next)* | Chromium via CDP · desktop screenshot · GPU matmul · ARM64 · macOS · Windows |
+| # | Provider | Probes | Start | Resume | Restore | Fork | $/h running / paused |
+|---|---|---|---|---|---|---|---|
+| 1 | Provider A | 11 ✓ · 0 ✗ · 0 — | 0.9 s · memory | 0.3 s 🧠 | 0.8 s 🧠 | 1.1 s 🧠 | 0.13 / 0.01 |
+| 2 | Provider B | 7 ✓ · 1 ✗ · 3 — | 0.4 s · pool | 0.6 s 🧠 | 2.4 s | — | 0.17 / 0.02 |
+| 3 | Provider C | 6 ✓ · 0 ✗ · 5 — | 0.5 s · pool | — | 1.8 s | — | 0.17 / — |
 
-**2. Performance boards: how fast, and how cheap?**
-These are speed races on start time, start with toolset, exec, file I/O, snapshot/restore, pause/resume, fork ×10 and $/hour. **You only get on a board if you pass its probe.** No working fork, no place on the fork board.
+✓ passed ≥ 9 of its last 10 attempts · ✗ offered, but passed fewer than 9 · — not offered · in a time column, ✗ or — means the probe behind it failed or isn't offered · 🧠 the running process survived · times are medians of the last 10 attempts · Start: **pool** = handed out from a pre-started pool, **memory** = booted from a saved memory image, **cold** = fresh boot · $/h: list price for one sandbox running, or paused, for an hour
 
-```
- #  Provider     Probes        Start     Resume    Fork×10   $/h
- 1  Provider A   94%  14/15    0.7s ⚡   0.1s 🧠   0.9s 🧠   0.13
- 2  Provider B   82%  12/15    0.4s ⚡   0.6s      2.1s 🧠   0.17
- 3  Provider C   67%   9/15    0.9s      —         —         0.11
-                                  ⚡ warm start   🧠 memory kept   (illustrative)
-```
+## How the score works
 
-## Quickstart
+Each ✓ is a probe that passed at least 9 of its last 10 attempts. ✗ means a feature is offered but passed fewer, and — means it isn't offered; both count as zero, and the cell shows which is which. Providers rank by their ✓ count, with ties going to the faster Start. A speed column shows a time only for providers that passed the probe behind it, and 🧠 means the running process survived.
+
+Each daily run makes 5 attempts per probe, so "the last 10" covers about two days. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
+
+## The probes (v0.1)
+
+| Probe | Passes when | Unlocks column |
+|---|---|---|
+| `create-exec` | A new sandbox runs a command and returns its output | Start |
+| `file-roundtrip` | A 10 MiB random file reads back with the same hash | |
+| `internet` | A pinned file downloads with the expected hash | |
+| `egress-block` | With outbound traffic denied, a connection fails | |
+| `exposed-port` | A web server inside the sandbox answers from outside | |
+| `pause-keeps-files` | After pause and resume, the files are intact | Resume |
+| `pause-keeps-memory` | After pause and resume, the same process is still running and counting | Resume 🧠 |
+| `snapshot-keeps-files` | A sandbox restored from a snapshot has the files | Restore |
+| `snapshot-keeps-memory` | A sandbox restored from a snapshot has the same process, still counting | Restore 🧠 |
+| `fork-keeps-memory` | A fork of a running sandbox has the parent's process, still counting | Fork 🧠 (time to the first fork's first command) |
+| `fork-isolation-x3` | 3 forks run, and a file written in one is invisible to the others | |
+
+Got an idea for a probe? [Propose it](CONTRIBUTING.md#propose-a-probe), especially for the feature you're proudest of.
+
+## Run it yourself
 
 *Coming with v0.1:*
 
 ```bash
 uv tool install sandbox-bench
-sbx run --providers e2b,modal
-sbx probe e2b --probe state/pause-keeps-memory
+sbx check daytona                                # every probe, with your own key
+sbx check freestyle --probe pause-keeps-memory   # just one
 ```
 
-## Add your sandbox
+Results you produce are yours to compare. The published tables come only from our runner.
 
-Run a sandbox platform? Adding it means writing one small adapter over your public SDK. Copy `providers/_template/`, implement `create`, `exec` and `destroy` (plus snapshot, fork and the rest if you support them), and open a PR. Every feature you support is a probe you can pass. See [CONTRIBUTING.md](CONTRIBUTING.md).
+## Add your provider
 
-Have an idea for a probe? Open an issue or start a discussion. Harder probes make a better benchmark.
+1. Copy `providers/_template.py` to `providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
+2. Run `sbx check <you>` with your own key, and paste its table into a PR.
+3. After merge, we run your provider daily from our machine, on your free tier or on credits you give the project. It appears on the leaderboard once each probe has 10 attempts.
+
+The template ships with the harness ([roadmap](docs/ROADMAP.md), step F5). Until then, open an issue and we'll put you in the queue. Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
+
+## Contribute
+
+Propose a probe in an issue with a one-sentence pass condition, or open a PR. A fake provider runs every probe offline, so `uv run pytest` needs no cloud account. One maintainer approval merges a PR. Start with [CONTRIBUTING](CONTRIBUTING.md).
+
+## Rules
+
+- **Same harness and rules for everyone.** No paid placement, and the raw data is public.
+- **Like for like.** Default settings on a public plan. A pre-started pool counts when the provider runs it for everyone at no extra cost; a warm pool you pay to keep idle doesn't. Plan and actual size are listed with each provider's results.
+- **Any public mechanism counts.** For example, a fork made by snapshotting and restoring N copies passes the fork probes. The mechanism is listed with the provider's results.
+- **"Offered" means your docs claim it.** A probe whose exact behaviour your public docs describe is tested, and can't be marked —.
+- **Providers are welcome.** You can maintain your own adapter and add a short note to your results. Probe changes are announced in an issue 7 days before they count.
+- **Something looks wrong?** Open a [dispute](https://github.com/sandboxrouting/sandbox-bench/issues/new). Every ✗ links to its evidence and the command that reproduces it.
+- **Adapters need an owner.** An adapter broken for 14 days is marked `stale`. If it stays broken, it is removed.
+
+## Why
+
+There are more than 15 sandbox providers for AI agents, and the features agents depend on most are the hardest to compare: pause and resume with memory intact, snapshots, forks, and cost while idle. Launch posts and docs pages don't settle it, so we measure.
 
 ## Docs
 
-- [Vision](docs/VISION.md): why this exists and where it's going
-- [Methodology](docs/METHODOLOGY.md): exactly what gets timed and how results are scored
-- [Governance](docs/GOVERNANCE.md): how providers and contributors take part
-- [Architecture](docs/ARCHITECTURE.md): harness, adapters and data format
-- [Roadmap](docs/ROADMAP.md): what's next
-- [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md): what exists today
+- [Methodology](docs/METHODOLOGY.md): probes, clock boundaries and scoring, on one page
+- [Contributing](CONTRIBUTING.md): add a provider, a probe or a fix
+- [Roadmap](docs/ROADMAP.md): what's being built and what's next
+- [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md)
 
 ## License
 
