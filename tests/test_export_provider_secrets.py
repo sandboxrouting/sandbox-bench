@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 import sys
 from pathlib import Path
@@ -23,7 +22,7 @@ def run(tmp_path: Path, providers: str) -> tuple[subprocess.CompletedProcess[str
     env_file.touch()
     result = subprocess.run(
         [sys.executable, str(SCRIPT), providers],
-        env={"SECRETS_JSON": json.dumps(SECRETS), "GITHUB_ENV": str(env_file)},
+        env={**SECRETS, "GITHUB_ENV": str(env_file)},
         capture_output=True,
         text=True,
         check=False,
@@ -61,7 +60,7 @@ def test_each_provider_gets_only_its_own_secrets(tmp_path: Path) -> None:
 def test_a_provider_without_secrets_fails_before_the_run(tmp_path: Path) -> None:
     result, env_file = run(tmp_path, "daytona,fake")
     assert result.returncode == 1
-    assert "no secrets named FAKE_*" in result.stderr
+    assert "no FAKE_* secrets" in result.stderr
     assert env_file == ""
 
 

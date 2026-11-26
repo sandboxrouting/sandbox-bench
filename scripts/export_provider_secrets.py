@@ -1,19 +1,21 @@
 """Pass the chosen providers' keys from the `live` environment to the rest of a workflow job.
 
-A secret belongs to provider ``acme`` when its name starts with ``ACME_``. Adding a provider
-then means adding its secrets to the environment, with no workflow edits (docs/RUNNER.md).
+A secret belongs to provider ``acme`` when its name starts with ``ACME_`` (docs/RUNNER.md).
 
-Used by the live-check and benchmark workflows, after dependencies are installed:
+Used by the live-check and benchmark workflows, after dependencies are installed. That one
+step names every provider's secrets in its ``env``; the script passes on only the chosen
+providers' ones, so later steps never see another provider's keys:
 
-    SECRETS_JSON: ${{ toJSON(secrets) }}
+    env:
+      DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+      ...
     run: python3 scripts/export_provider_secrets.py "$PROVIDERS"   # e.g. daytona,freestyle
 
-It appends the matching secrets to ``$GITHUB_ENV`` and prints their names, never values.
+It appends the matching variables to ``$GITHUB_ENV`` and prints their names, never values.
 """
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import secrets
@@ -35,7 +37,7 @@ def provider_secrets(providers: list[str], available: Mapping[str, str]) -> dict
         prefix = f"{provider.upper()}_"
         mine = {name: value for name, value in available.items() if name.startswith(prefix)}
         if not mine:
-            msg = f"no secrets named {prefix}* in the live environment"
+            msg = f"no {prefix}* secrets given to this step; add them to its env and to `live`"
             raise ValueError(msg)
         found.update(mine)
     return found
@@ -56,7 +58,7 @@ def main(argv: list[str]) -> int:
         return 2
     providers = [p.strip() for p in argv[1].split(",") if p.strip()]
     try:
-        values = provider_secrets(providers, json.loads(os.environ.get("SECRETS_JSON", "{}")))
+        values = provider_secrets(providers, os.environ)
     except ValueError as exc:
         sys.stderr.write(f"::error::{exc}\n")
         return 1

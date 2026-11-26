@@ -30,7 +30,7 @@ A provider failing its probes is a result, so it never stops the run or the push
   - each provider's keys, named after it: `DAYTONA_API_KEY`, `DAYTONA_API_URL`, `FREESTYLE_API_KEY`;
   - `RESULTS_DEPLOY_KEY`, the private half of a deploy key with write access on the results repo.
 
-  A run passes each provider only the secrets whose names start with its own (`DAYTONA_…`), via [`scripts/export_provider_secrets.py`](../scripts/export_provider_secrets.py). A new provider needs only its keys added here, with no workflow edits.
+  For a new provider, add its keys here and one line per key to the "Pass the provider's keys" step in `benchmark.yml` and `live-check.yml`. That step lists keys by name: GitHub flags a workflow that reads all secrets at once (`toJSON(secrets)`) as possibly malicious and won't run it. A run then passes each provider only the keys whose names start with its own (`DAYTONA_…`), via [`scripts/export_provider_secrets.py`](../scripts/export_provider_secrets.py).
 
 ## The results repo
 
