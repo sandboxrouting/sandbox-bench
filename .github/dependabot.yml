@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ["*"] }
+  # Python dev tooling only. Provider SDKs are pinned on purpose and upgraded by hand
+  # (METHODOLOGY §8), so dependabot ignores them.
+  - package-ecosystem: uv
+    directory: /
+    schedule: { interval: weekly }
+    ignore:
+      - dependency-name: daytona
+    groups:
+      dev-tools: { patterns: ["ruff", "mypy", "pytest*", "types-*"] }

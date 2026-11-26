@@ -1,0 +1,26 @@
+[Unit]
+Description=sandbox-bench daily run (planned, docs/RUNNER.md)
+Documentation=https://github.com/sandboxrouting/sandbox-bench/blob/main/docs/RUNNER.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=sbx
+Group=sbx
+EnvironmentFile=/etc/sandbox-bench/env
+ExecStart=/home/sbx/sandbox-bench/deploy/publish-run.sh
+# A full run is ~11 probes x 10 attempts per provider, with snapshots that can take minutes.
+TimeoutStartSec=6h
+Nice=5
+# Hardening: the run needs the network and its two checkouts, nothing else.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/sbx/sandbox-bench /home/sbx/sandbox-bench-results /home/sbx/.cache/uv /home/sbx/.local/share/uv
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes

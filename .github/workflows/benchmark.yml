@@ -1,0 +1,71 @@
+name: Benchmark run
+
+# The only way results get published (ADR-0010, docs/RUNNER.md): a maintainer starts it by
+# hand, from main. It runs `sbx run` on the chosen providers, then commits the raw run record
+# and the rebuilt tables to the results repo, whatever the outcome.
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: Providers, comma-separated
+        required: true
+        default: daytona,freestyle
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  # One published run at a time: runs never overlap on a provider or race on the results repo.
+  group: benchmark-run
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: sbx run
+    # Only main publishes: a run from a branch would score code nobody reviewed.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    environment: live   # protected: requires a maintainer's approval and holds the keys
+    env:
+      DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+      DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
+      FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
+      SBX_PROVIDERS: ${{ inputs.providers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check out the results repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: sandboxrouting/sandbox-bench-results
+          path: results
+          ssh-key: ${{ secrets.RESULTS_DEPLOY_KEY }}
+          persist-credentials: true # zizmor: ignore[artipacked] the run pushes its record here
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - name: Record the runner's region
+        # GitHub-hosted runners are Azure VMs; GitHub doesn't pin their region, so record it.
+        run: |
+          region=$(curl -fsS -m 3 -H Metadata:true \
+            "http://169.254.169.254/metadata/instance/compute/location?api-version=2021-02-01&format=text" \
+            || true)
+          echo "SBX_RUNNER_REGION=github-hosted (${region:-region unknown})" >> "$GITHUB_ENV"
+      - name: Run and publish
+        env:
+          SBX_HOME: ${{ github.workspace }}
+          SBX_RESULTS: ${{ github.workspace }}/results
+          SBX_UPDATE: "0"
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git -C results config user.name "sandbox-bench runner"
+          git -C results config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SBX_COMMIT_NOTE="Started by ${ACTOR}: ${RUN_URL}" deploy/publish-run.sh
+          cat results/board/leaderboard.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Delete leftovers
+        if: always()
+        run: |
+          IFS=, read -ra providers <<< "$SBX_PROVIDERS"
+          for p in "${providers[@]}"; do uv run --frozen --no-dev sbx reap "$p" || true; done

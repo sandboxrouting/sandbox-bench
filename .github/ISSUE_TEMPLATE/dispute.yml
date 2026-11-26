@@ -1,0 +1,30 @@
+name: Dispute a result
+description: A probe verdict or a timing looks wrong for a provider.
+title: "dispute: <provider> <probe>"
+labels: [dispute]
+body:
+  - type: input
+    id: provider
+    attributes: { label: Provider, placeholder: e.g. daytona }
+    validations: { required: true }
+  - type: input
+    id: probe
+    attributes: { label: Probe or column, placeholder: e.g. pause-keeps-memory, or Resume }
+    validations: { required: true }
+  - type: input
+    id: run
+    attributes:
+      label: Run id or date
+      description: From the results repo, e.g. runs/2026/12/01/…
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and why
+      description: Link the docs or the evidence. If you ran `sbx check`, paste its table and command.
+    validations: { required: true }
+  - type: checkboxes
+    id: affiliation
+    attributes:
+      label: Affiliation
+      options:
+        - label: I work for, or am paid by, this provider (that's welcome; we just note it)

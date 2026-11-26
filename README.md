@@ -1,8 +1,11 @@
-# sandbox-bench
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.svg">
+    <img src="docs/assets/hero-light.svg" alt="sandbox-bench: does your sandbox keep your agent's process running when you pause, snapshot or fork it?">
+  </picture>
+</h1>
 
-**Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast?**
-
-sandbox-bench checks every day, with the same probes for every provider. No paid placement. Measured from one machine in us-east. Raw data in git.
+sandbox-bench runs the same probes on every provider. No paid placement. Every run is published, with its raw data in git.
 
 > **Pre-launch.** v0.1 is being built. See the [roadmap](docs/ROADMAP.md).
 
@@ -27,7 +30,14 @@ sandbox-bench checks every day, with the same probes for every provider. No paid
 
 A probe passes when at least 9 of its last 10 attempts succeed. A provider's score is the share of the 11 probes it passes, shown with the count (e.g. 64%, 7 of 11). Every probe weighs the same, and providers rank by that score, with ties going to the faster Start. A probe that is offered but passes less often is named as failing, and one that isn't offered is n/a; both count as zero. A time column shows a number only when the probe behind it passes.
 
-Each daily run makes 5 attempts per probe, so "the last 10" covers about two days. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
+Each run makes 10 attempts per probe, so every published run is a complete result, dated. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-a-run-works-dark.svg">
+  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1, Start: a maintainer starts the Benchmark run workflow. 2, Measure: 10 attempts of every probe, per provider. 3, Record: raw results go to the results repo. 4, Score: sbx report builds the leaderboard.">
+</picture>
+
+*How a run reaches the leaderboard. Details, and the planned daily runs, are in [RUNNER](docs/RUNNER.md).*
 
 ## The probes (v0.1)
 
@@ -45,27 +55,43 @@ Each daily run makes 5 attempts per probe, so "the last 10" covers about two day
 | `fork-keeps-memory` | A fork of a running sandbox has the parent's process, still counting | Fork (time to the fork's first command), Keeps memory on: fork |
 | `fork-isolation-x3` | 3 forks run, and a file written in one is invisible to the others | |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/memory-check-dark.svg">
+  <img src="docs/assets/memory-check-light.svg" alt="The memory check. Before: start a counter that adds 1 every 0.5 s, fill 32 MiB of RAM, and write down the PID, the RAM hash and the count. After a pause, snapshot or fork, it passes only with the same process, the same RAM contents and a count still rising. A restarted sandbox fails: a new process, empty RAM, a stuck count.">
+</picture>
+
+*The memory check behind the three `-keeps-memory` probes ([methodology §3](docs/METHODOLOGY.md#3-the-memory-check)).*
+
 Got an idea for a probe? [Propose it](CONTRIBUTING.md#propose-a-probe), especially for the feature you're proudest of.
 
 ## Run it yourself
 
-*Coming with v0.1:*
+From a checkout (a PyPI release comes with v0.1):
 
 ```bash
-uv tool install sandbox-bench
-sbx check daytona                                # every probe, with your own key
-sbx check freestyle --probe pause-keeps-memory   # just one
+uv sync
+uv run sbx check fake                                   # offline: try the harness, no account
+uv run sbx check daytona                                # every probe, with your own key
+uv run sbx check freestyle --probe pause-keeps-memory   # just one
+uv run sbx run --providers daytona,freestyle --out runs # a full run, as published runs do it
+uv run sbx report runs --out board                      # score run records into tables
 ```
 
-Results you produce are yours to compare. The published tables come only from our runner.
+Keys come from environment variables only, e.g. `DAYTONA_API_KEY`.
+
+<img src="docs/assets/sbx-check-freestyle.svg" alt="Terminal: sbx check freestyle writes its run record, then prints a table where all 11 probes pass 1/1, with medians Start 0.8 s, Exec 0.2 s, Resume 1.6 s, Pause 0.4 s, Restore 0.8 s, Snapshot 0.5 s and Fork 3.4 s.">
+
+*Real output from a Freestyle run on 2026-11-26.*
+
+Results you produce are yours to compare. The published tables come only from our runner workflow.
 
 ## Add your provider
 
-1. Copy `providers/_template.py` to `providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
+1. Copy `src/sandbox_bench/providers/_template.py` to `src/sandbox_bench/providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
 2. Run `sbx check <you>` with your own key, and paste its table into a PR.
-3. After merge, we run your provider daily from our machine, on your free tier or on credits you give the project. It appears on the leaderboard once each probe has 10 attempts.
+3. After merge, your provider joins the next published run, on your free tier or on credits you give the project.
 
-The template ships with the harness ([roadmap](docs/ROADMAP.md), step F5). Until then, open an issue and we'll put you in the queue. Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
+Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
 
 ## Contribute
 
@@ -88,6 +114,8 @@ There are more than 15 sandbox providers for AI agents, and the features agents 
 ## Docs
 
 - [Methodology](docs/METHODOLOGY.md): probes, clock boundaries and scoring, on one page
+- [Threats to validity](docs/METHODOLOGY.md#9-threats-to-validity): every known way these results could mislead
+- [Decisions](docs/decisions/README.md): each judgement call, with the alternatives we didn't take
 - [Contributing](CONTRIBUTING.md): add a provider, a probe or a fix
 - [Roadmap](docs/ROADMAP.md): what's being built and what's next
 - [Landscape research (Nov 2026)](docs/research/landscape-2026-11.md)

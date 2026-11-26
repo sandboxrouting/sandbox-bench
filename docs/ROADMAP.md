@@ -13,7 +13,7 @@
 | F3 | The 11 probes as 5 actions (basics, network, pause, snapshot, fork), each tested pass and fail on the fake provider | Every probe has a passing and a failing test |
 | F4 | **Daytona** (SDK) and **Freestyle** (REST) adapters | Both run every probe live; the memory probes pass on Freestyle |
 | F5 | `sbx check`, `providers/_template.py`, `sbx report` writing Markdown tables and `results.json` | A new adapter can be checked without reading harness code |
-| F6 | The fixed machine: a daily cron job that pushes raw results to a separate results repo | Daytona and Freestyle have run daily for several days |
+| F6 | Publishing: a manual workflow that runs the benchmark and pushes raw results to a separate results repo ([ADR-0010](decisions/0010-manual-runs-from-one-workflow.md)) | Daytona and Freestyle each have a published run |
 
 ## 2. Provider sprint
 
@@ -23,7 +23,7 @@ One provider per PR, split between the two maintainers. Planned: E2B, Modal, Ver
 - the adapter file is complete and lists every offered probe with a docs link;
 - `sbx check` passes, with its table in the PR;
 - the provider's terms allow publishing benchmark results;
-- the account runs 2 vCPU / 4 GiB on its free tier or on credits from the provider.
+- the account runs 2 vCPU / 4 GiB on a public plan (free tier, credits or pay-as-you-go), named in its row ([ADR-0006](decisions/0006-paid-plans-allowed.md)).
 
 ## 3. Launch
 
@@ -37,6 +37,7 @@ One provider per PR, split between the two maintainers. Planned: E2B, Modal, Ver
 
 | Next | Contents |
 |---|---|
+| **Daily runs** | Once the project has users: a daily run from a fixed us-east machine, which also pins the runner's region. The setup is ready in `deploy/` ([RUNNER](RUNNER.md#planned-daily-runs-on-a-fixed-machine)). |
 | **v0.2** | <ul><li>Probes: `docker-in-sandbox`, `dockerfile`, `pause-1h-resume`</li><li>A pinned toolset (Python, Node, build tools) and a "Start with toolset" column</li><li>A claim column: each provider's published number with its source and clock boundary</li><li>Embeddable badges</li><li>Cloudflare, via a TypeScript bridge</li></ul> |
 | **v0.3** | <ul><li>Specialized probes: Chromium via CDP, desktop screenshot, GPU, ARM64, macOS, Windows</li><li>More runner regions</li></ul> |
 | **Later** | <ul><li>Website</li><li>Real workloads (Terminal-Bench via Harbor)</li><li>Burst and scale tests</li><li>Measured (billed) cost</li><li>A weekly "what changed" post</li><li>An agent-readable feed of results</li></ul> |
@@ -47,5 +48,6 @@ One provider per PR, split between the two maintainers. Planned: E2B, Modal, Ver
 |---|---|
 | A provider disputes a result | Public verifiers and evidence, a reproduce command on every failing probe, provider notes |
 | Adapters rot as SDKs change | Pinned SDKs, an owner per adapter, the 14-day stale rule |
-| Free credits run out | Small payloads, few attempts per day, credits requested early |
-| Scope creep | A ~1,500-line budget for the harness, and one version for everything |
+| Free credits run out | Small payloads, runs only when started by hand, credits requested early |
+| Results go stale between runs | Each board shows its run date; daily runs once there's demand |
+| Scope creep | A ~1,800-line budget for the harness ([ADR-0003](decisions/0003-line-budget-counts-shared-probe-code.md)), and one version for everything |

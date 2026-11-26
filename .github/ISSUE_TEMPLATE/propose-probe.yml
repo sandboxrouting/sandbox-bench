@@ -1,0 +1,26 @@
+name: Propose a probe
+description: A new pass/fail check every provider could be measured on.
+title: "probe: <name>"
+labels: [probe-proposal]
+body:
+  - type: input
+    id: condition
+    attributes:
+      label: Pass condition, in one sentence
+      placeholder: After pause and resume, the same process is still running and counting
+    validations: { required: true }
+  - type: textarea
+    id: why
+    attributes:
+      label: Why agents care
+    validations: { required: true }
+  - type: textarea
+    id: verifier
+    attributes:
+      label: How to verify it
+      description: Adapter calls plus `sh` inside the sandbox only (METHODOLOGY §1). Sketch the commands.
+  - type: textarea
+    id: offered
+    attributes:
+      label: Which providers' docs claim this today?
+      description: Links, if you know them.
