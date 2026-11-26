@@ -33,7 +33,7 @@ jobs:
       - name: Lockfile is up to date
         run: uv lock --check
         env:
-          UV_FROZEN: ""
+          UV_FROZEN: "0"         # --check needs to resolve; uv rejects an empty value
       - name: ruff check
         run: uv run ruff check --output-format=github .
       - name: ruff format
@@ -98,7 +98,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
-      - run: uvx zizmor@1 --format=github .github/workflows
+      - run: uvx zizmor@1.32.0 --format=github .github/workflows
 
   ci-ok:
     name: CI ok
