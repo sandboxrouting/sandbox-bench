@@ -43,9 +43,11 @@ jobs:
         id: keys
         env:
           PROVIDERS: ${{ inputs.provider }}
-          # Each provider gets only the secrets named after it (scripts/export_provider_secrets.py),
-          # so a new provider needs no edits here. Runs after `uv sync`, so no install step sees keys.
-          SECRETS_JSON: ${{ toJSON(secrets) }} # zizmor: ignore[overprovisioned-secrets] filtered by name
+          # Every provider's keys, listed by name. The script passes on only the chosen providers'
+          # ones (docs/RUNNER.md). Runs after `uv sync`, so no install step sees keys.
+          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+          DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
+          FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
         run: python3 scripts/export_provider_secrets.py "$PROVIDERS"
       - name: sbx check
         env:
