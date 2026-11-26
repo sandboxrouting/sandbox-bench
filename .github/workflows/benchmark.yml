@@ -43,6 +43,8 @@ jobs:
           persist-credentials: true # zizmor: ignore[artipacked] the run pushes its record here
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - run: uv sync --frozen --no-dev
+      - name: Record the runner's region
+        run: echo "SBX_RUNNER_REGION=$(deploy/runner-region.sh)" >> "$GITHUB_ENV"
       - name: Pass the providers' keys to later steps
         id: keys
         env:
@@ -53,13 +55,6 @@ jobs:
           DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
           FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
         run: python3 scripts/export_provider_secrets.py "$PROVIDERS"
-      - name: Record the runner's region
-        # GitHub-hosted runners are Azure VMs; GitHub doesn't pin their region, so record it.
-        run: |
-          region=$(curl -fsS -m 3 -H Metadata:true \
-            "http://169.254.169.254/metadata/instance/compute/location?api-version=2021-02-01&format=text" \
-            || true)
-          echo "SBX_RUNNER_REGION=github-hosted (${region:-region unknown})" >> "$GITHUB_ENV"
       - name: Run and publish
         env:
           SBX_HOME: ${{ github.workspace }}

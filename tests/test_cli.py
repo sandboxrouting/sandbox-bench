@@ -77,8 +77,10 @@ def test_check_prints_the_table(
     argv = ["check", "fake", "--probe", "pause-keeps-memory", "--out", str(tmp_path)]
     assert main(argv) == 0
     out = capsys.readouterr().out
-    assert "| pause-keeps-memory | 1/1 | pass |" in squeeze(out)
-    assert "| create-exec | - | not run |" in squeeze(out)
+    assert "| pause-keeps-memory | 1/1 | pass | Start " in squeeze(out)
+    # Timings sit on the probe that ran, never on a "not run" row.
+    assert "| create-exec | - | not run | |" in squeeze(out)
+    assert "| pause-keeps-files | - | not run | |" in squeeze(out)
     assert closed == [True]
 
 
