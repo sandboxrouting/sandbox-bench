@@ -63,7 +63,7 @@ A restarted sandbox fails, because it has a new process start time and an empty 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/memory-check-dark.svg">
-  <img src="assets/memory-check-light.svg" alt="The memory check: before the action the harness records the counter loop's PID, start time and command line, the /dev/shm hash and v0. After the action, the same process, the same hash and v0 ≤ r1 < r2 pass; a restarted sandbox fails all three.">
+  <img src="assets/memory-check-light.svg" alt="The memory check. Before: start a counter that adds 1 every 0.5 s, fill 32 MiB of RAM, and write down the PID, the RAM hash and the count. After a pause, snapshot or fork, it passes only with the same process, the same RAM contents and a count still rising. A restarted sandbox fails: a new process, empty RAM, a stuck count.">
 </picture>
 
 ## 4. Timings

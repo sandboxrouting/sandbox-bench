@@ -1,11 +1,9 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.svg">
-  <img src="docs/assets/hero-light.svg" alt="sandbox-bench. Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast? A process counter keeps rising through pause and resume, snapshot and restore, and a fork, where parent and child both still run pid 2008.">
-</picture>
-
-# sandbox-bench
-
-**Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast?**
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.svg">
+    <img src="docs/assets/hero-light.svg" alt="sandbox-bench: does your sandbox keep your agent's process running when you pause, snapshot or fork it?">
+  </picture>
+</h1>
 
 sandbox-bench runs the same probes on every provider. No paid placement. Every run is published, with its raw data in git.
 
@@ -36,7 +34,7 @@ Each run makes 10 attempts per probe, so every published run is a complete resul
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-a-run-works-dark.svg">
-  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1: a maintainer starts the Benchmark run workflow, which runs sbx run, and the adapters drive each provider's 2 vCPU / 4 GiB sandboxes through 10 attempts of every probe, shuffled, one operation in flight. 2: the raw run record goes to a separate results repo, append-only. 3: sbx report scores all runs. 4: the leaderboard tables are committed and pushed.">
+  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1, Start: a maintainer starts the Benchmark run workflow. 2, Measure: 10 attempts of every probe, per provider. 3, Record: raw results go to the results repo. 4, Score: sbx report builds the leaderboard.">
 </picture>
 
 *How a run reaches the leaderboard. Details, and the planned daily runs, are in [RUNNER](docs/RUNNER.md).*
@@ -59,7 +57,7 @@ Each run makes 10 attempts per probe, so every published run is a complete resul
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/memory-check-dark.svg">
-  <img src="docs/assets/memory-check-light.svg" alt="The memory check. Before the action, an sh loop counts in memory and writes i to a file every 0.5 s, 32 MiB of random bytes sit in /dev/shm, and the harness records PID, start time, command line, the buffer's hash and the counter v0. After pause and resume, snapshot and restore, or a fork, it passes only if the same process is running, the hash matches, and two reads at least 2 s apart show v0 ≤ r1 < r2. A restarted sandbox fails: new start time, empty /dev/shm, counter not rising.">
+  <img src="docs/assets/memory-check-light.svg" alt="The memory check. Before: start a counter that adds 1 every 0.5 s, fill 32 MiB of RAM, and write down the PID, the RAM hash and the count. After a pause, snapshot or fork, it passes only with the same process, the same RAM contents and a count still rising. A restarted sandbox fails: a new process, empty RAM, a stuck count.">
 </picture>
 
 *The memory check behind the three `-keeps-memory` probes ([methodology §3](docs/METHODOLOGY.md#3-the-memory-check)).*
