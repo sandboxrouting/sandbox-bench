@@ -29,9 +29,6 @@ jobs:
     timeout-minutes: 300
     environment: live   # protected: requires a maintainer's approval and holds the keys
     env:
-      DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-      DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
-      FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
       SBX_PROVIDERS: ${{ inputs.providers }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,6 +42,15 @@ jobs:
           ssh-key: ${{ secrets.RESULTS_DEPLOY_KEY }}
           persist-credentials: true # zizmor: ignore[artipacked] the run pushes its record here
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv sync --frozen --no-dev
+      - name: Pass the providers' keys to later steps
+        id: keys
+        env:
+          PROVIDERS: ${{ inputs.providers }}
+          # Each provider gets only the secrets named after it (scripts/export_provider_secrets.py),
+          # so a new provider needs no edits here. Runs after `uv sync`, so no install step sees keys.
+          SECRETS_JSON: ${{ toJSON(secrets) }} # zizmor: ignore[overprovisioned-secrets] filtered by name
+        run: python3 scripts/export_provider_secrets.py "$PROVIDERS"
       - name: Record the runner's region
         # GitHub-hosted runners are Azure VMs; GitHub doesn't pin their region, so record it.
         run: |
@@ -65,7 +71,7 @@ jobs:
           SBX_COMMIT_NOTE="Started by ${ACTOR}: ${RUN_URL}" deploy/publish-run.sh
           cat results/board/leaderboard.md >> "$GITHUB_STEP_SUMMARY"
       - name: Delete leftovers
-        if: always()
+        if: always() && steps.keys.outcome == 'success'
         run: |
           IFS=, read -ra providers <<< "$SBX_PROVIDERS"
           for p in "${providers[@]}"; do uv run --frozen --no-dev sbx reap "$p" || true; done

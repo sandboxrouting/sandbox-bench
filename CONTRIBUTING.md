@@ -87,12 +87,13 @@ The harness is kept under 1,800 lines: everything outside `providers/` and `prob
 
 3. **Open a PR** and paste the table `sbx check` printed.
 
-After merge, your provider joins the next published run ([RUNNER](docs/RUNNER.md)), which makes 10 attempts per probe.
+After merge, a maintainer adds your keys to the `live` environment, and your provider joins the next published run ([RUNNER](docs/RUNNER.md)), which makes 10 attempts per probe.
 
 **Adapter rules:**
 - **Public API only.** Use your public SDK or REST API, with the SDK version pinned.
 - **Map, don't optimise.** No retries, pre-warming or caching. The harness does all the timing.
 - **Use the harness's helpers.** Poll with `self.wait_until(...)`, and create only resources named from `spec.name` (or `name` for snapshots); that `sbx-` prefix is how cleanup finds them.
+- **Credentials.** Read them from environment variables named after your provider (`ACME_API_KEY`, `ACME_API_URL`). Published runs pass a provider only the secrets with its prefix.
 - **Errors.** Raise `AccountError` only for problems on our side (missing key, no credits, a plan limit); those attempts are excluded. Any other exception counts as a provider failure, including being throttled for request rate ([ADR-0009](docs/decisions/0009-throttling-is-the-providers-failure.md)).
 - **Pacing and timeouts.** Set `pacing_s` from your documented rate limit, with a link to it. Timeouts are the same for everyone.
 

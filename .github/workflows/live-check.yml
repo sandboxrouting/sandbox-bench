@@ -8,8 +8,7 @@ on:
       provider:
         description: Provider to check
         required: true
-        type: choice
-        options: [daytona, freestyle]
+        type: string   # a module in src/sandbox_bench/providers, e.g. daytona
       probe:
         description: Only this probe (blank for every offered probe)
         required: false
@@ -40,24 +39,26 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - run: uv sync --frozen --no-dev
+      - name: Pass the provider's keys to later steps
+        id: keys
+        env:
+          PROVIDERS: ${{ inputs.provider }}
+          # Each provider gets only the secrets named after it (scripts/export_provider_secrets.py),
+          # so a new provider needs no edits here. Runs after `uv sync`, so no install step sees keys.
+          SECRETS_JSON: ${{ toJSON(secrets) }} # zizmor: ignore[overprovisioned-secrets] filtered by name
+        run: python3 scripts/export_provider_secrets.py "$PROVIDERS"
       - name: sbx check
         env:
           PROVIDER: ${{ inputs.provider }}
           PROBE: ${{ inputs.probe }}
           ATTEMPTS: ${{ inputs.attempts }}
-          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-          DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
-          FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
           SBX_RUNNER_REGION: github-actions
         run: |
           args=(check "$PROVIDER" --attempts "$ATTEMPTS")
           if [ -n "$PROBE" ]; then args+=(--probe "$PROBE"); fi
           uv run --frozen --no-dev sbx "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Delete leftovers
-        if: always()
+        if: always() && steps.keys.outcome == 'success'
         env:
           PROVIDER: ${{ inputs.provider }}
-          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-          DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
-          FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
         run: uv run --frozen --no-dev sbx reap "$PROVIDER"
