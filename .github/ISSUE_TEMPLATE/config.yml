@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Methodology
+    url: https://github.com/sandboxrouting/sandbox-bench/blob/main/docs/METHODOLOGY.md
+    about: How every probe, clock and score is defined. Worth a look before filing.

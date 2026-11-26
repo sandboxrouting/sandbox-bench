@@ -1,0 +1,24 @@
+name: Add a provider
+description: Ask for a provider to be benchmarked, or tell us you're writing its adapter.
+title: "provider: <name>"
+labels: [provider]
+body:
+  - type: input
+    id: name
+    attributes: { label: Provider and product, placeholder: e.g. Acme (microvm) }
+    validations: { required: true }
+  - type: input
+    id: docs
+    attributes: { label: SDK or API docs }
+    validations: { required: true }
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who writes the adapter?
+      options: [I will open the PR, Please add it to the queue]
+    validations: { required: true }
+  - type: textarea
+    id: offers
+    attributes:
+      label: Probes the docs claim
+      description: Pause/resume with memory, snapshots, fork, egress control, exposed ports… with links.

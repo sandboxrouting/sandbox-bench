@@ -1,0 +1,63 @@
+name: Live check
+
+# Runs `sbx check` against a real provider with the project's keys. Manual only: secrets are
+# never exposed to pull requests, and every run spends provider credits.
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: Provider to check
+        required: true
+        type: choice
+        options: [daytona, freestyle]
+      probe:
+        description: Only this probe (blank for every offered probe)
+        required: false
+        type: string
+      attempts:
+        description: Attempts per probe
+        required: false
+        default: "1"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  # One live run per provider at a time, so runs never contend for free-tier quotas.
+  group: live-${{ inputs.provider }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: sbx check ${{ inputs.provider }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: live   # protected: requires a maintainer's approval and holds the keys
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv sync --frozen --no-dev
+      - name: sbx check
+        env:
+          PROVIDER: ${{ inputs.provider }}
+          PROBE: ${{ inputs.probe }}
+          ATTEMPTS: ${{ inputs.attempts }}
+          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+          DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
+          FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
+          SBX_RUNNER_REGION: github-actions
+        run: |
+          args=(check "$PROVIDER" --attempts "$ATTEMPTS")
+          if [ -n "$PROBE" ]; then args+=(--probe "$PROBE"); fi
+          uv run --frozen --no-dev sbx "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Delete leftovers
+        if: always()
+        env:
+          PROVIDER: ${{ inputs.provider }}
+          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+          DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
+          FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
+        run: uv run --frozen --no-dev sbx reap "$PROVIDER"
