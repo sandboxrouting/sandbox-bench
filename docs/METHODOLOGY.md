@@ -89,8 +89,8 @@ A timeout is a failure, never a capped sample. Any rate-limit pacing happens out
 ## 5. Scoring and ranking
 
 - **Main table:**
-  - Rows are ranked by the number of probes passed, with ties broken by Start p50.
-  - There are no weights and no percentages.
+  - Rows are ranked by score (the share of probes passed), with ties broken by Start p50.
+  - The score is probes passed ÷ probes in the version (11 in v0.1), shown as a percentage with the count, e.g. "64% (7 of 11)". Every probe weighs the same.
 - **Speed columns:**
   - Each shows the median (p50) of the last 10 attempts. Fork is the time to the first command in one fork.
   - A provider appears in a column only if it passes that column's probe.

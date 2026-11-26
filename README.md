@@ -12,12 +12,12 @@ sandbox-bench checks every day, with the same probes for every provider. No paid
 
 | # | Provider | Probes passed | Keeps memory on | Start | Resume | Restore | Fork | $/h running / paused |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Provider A | 11 of 11 | pause, snapshot, fork | 0.9 s (snapshot) | 0.3 s | 0.8 s | 1.1 s | 0.13 / 0.01 |
-| 2 | Provider B | 7 of 11 (failing: egress-block) | pause | 0.4 s (pool) | 0.6 s | 2.4 s | n/a | 0.17 / 0.02 |
-| 3 | Provider C | 6 of 11 | none | 1.6 s (cold) | n/a | 1.8 s | n/a | 0.17 / n/a |
+| 1 | Provider A | 100% (11 of 11) | pause, snapshot, fork | 0.9 s (snapshot) | 0.3 s | 0.8 s | 1.1 s | 0.13 / 0.01 |
+| 2 | Provider B | 64% (7 of 11), failing: egress-block | pause | 0.4 s (pool) | 0.6 s | 2.4 s | n/a | 0.17 / 0.02 |
+| 3 | Provider C | 55% (6 of 11) | none | 1.6 s (cold) | n/a | 1.8 s | n/a | 0.17 / n/a |
 
 **How to read it:**
-- **Probes passed:** probes that passed at least 9 of their last 10 attempts. "Failing" names probes the provider offers that passed less often. The rest aren't offered.
+- **Probes passed:** the share and count of the 11 probes that passed at least 9 of their last 10 attempts. "Failing" names probes the provider offers that passed less often. The rest aren't offered.
 - **Keeps memory on:** the operations after which the agent's running process was still alive and counting.
 - **Times:** medians of the last 10 attempts, shown only when the probe behind the column passes. "n/a" means not offered, and "failing" means offered but not passing. Resume and Restore are timed on the files probes; "Keeps memory on" says whether the process survived too.
 - **Start:** **pool** = handed out from a pre-started pool, **snapshot** = booted from a saved memory snapshot, **cold** = fresh boot.
@@ -25,7 +25,7 @@ sandbox-bench checks every day, with the same probes for every provider. No paid
 
 ## How the score works
 
-A probe passes when at least 9 of its last 10 attempts succeed. Providers rank by how many of the 11 probes they pass, with ties going to the faster Start. A probe that is offered but passes less often is named as failing, and one that isn't offered is n/a; both count as zero. A time column shows a number only when the probe behind it passes.
+A probe passes when at least 9 of its last 10 attempts succeed. A provider's score is the share of the 11 probes it passes, shown with the count (e.g. 64%, 7 of 11). Every probe weighs the same, and providers rank by that score, with ties going to the faster Start. A probe that is offered but passes less often is named as failing, and one that isn't offered is n/a; both count as zero. A time column shows a number only when the probe behind it passes.
 
 Each daily run makes 5 attempts per probe, so "the last 10" covers about two days. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
 
