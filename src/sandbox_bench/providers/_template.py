@@ -9,9 +9,10 @@ Rules (CONTRIBUTING, "Adapter rules"):
   timeouts, pacing and cleanup.
 - Name every resource from ``spec.name`` (snapshots from ``name``): the ``sbx-`` prefix is how
   ``reap`` finds leftovers.
-- Credentials come from environment variables only. Raise ``AccountError`` for problems on
-  our side (missing or expired key, no credits, a plan limit); any other exception counts as a
-  provider failure.
+- Credentials come from environment variables only, named after the provider (``ACME_*``):
+  published runs pass a provider only the secrets with its prefix. Raise ``AccountError`` for
+  problems on our side (missing or expired key, no credits, a plan limit); any other exception
+  counts as a provider failure.
 - Delete the optional methods you don't offer. Each probe you list in ``offers`` needs the
   operations in ``benchmark.REQUIRES``; ``sbx validate`` checks that.
 """
