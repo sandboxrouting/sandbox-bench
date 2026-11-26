@@ -14,11 +14,13 @@ Notes for readers of the results:
 - Every sandbox gets a wall-clock TTL, so one leaked by a crashed run deletes itself.
 - With ``network_block_all`` a TCP handshake to any address still completes (a sinkhole), but
   no data comes back and DNS returns no answers; only a real request shows the block.
-- The SDK keeps HTTP connections to the sandbox proxy alive, but the proxy drops them after
-  about 5 idle minutes and the SDK's next command on one fails with a connection reset. So
-  after ``STALE_AFTER_S`` without a command, create and restore start from a new SDK client
-  (3.5 ms, no network): nothing is retried, the new sandbox just doesn't inherit dead
-  connections. A sandbox created *before* such a gap keeps the old client and can still hit one.
+- The SDK pools HTTP connections to the toolbox proxy with no TCP keepalive, and doesn't retry
+  a reset on a reused connection. A NAT router or firewall on the runner's network can drop an
+  idle connection's state (about 5 minutes on the network we tested from), and the SDK's next
+  command on it then fails with a connection reset. So after ``STALE_AFTER_S`` without a
+  command, create and restore start from a new SDK client (3.5 ms, no network): nothing is
+  retried, the new sandbox just doesn't inherit stale connections. A sandbox created *before*
+  such a gap keeps the old client and can still hit one.
   See docs/decisions/0002-daytona-fresh-client-after-idle.md.
 """
 
@@ -61,8 +63,8 @@ crashed run. Longer than any attempt (snapshot timeout 15 min, plus restore and 
 LABELS: Final = {"created-by": "sandbox-bench"}
 PREVIEW_TOKEN_HEADER: Final = "X-Daytona-Preview-Token"  # noqa: S105 - a header name
 STALE_AFTER_S: Final = 240.0
-"""Idle time after which the proxy may have closed the SDK's connections (fine at 245 s,
-reset at 310 s and 340 s in testing, 2026-11-26)."""
+"""Idle time after which a pooled connection may be stale (fine up to 300 s, reset from 310 s
+on the network we tested from, 2026-11-26)."""
 
 _ACCOUNT_STATUS: Final = frozenset({401, 402, 403})
 _ACCOUNT_WORDS: Final = ("quota", "credit", "suspended", "limit exceeded", "billing")
