@@ -87,7 +87,7 @@ The harness is kept under 1,800 lines: everything outside `providers/` and `prob
 
 3. **Open a PR** and paste the table `sbx check` printed.
 
-After merge, a maintainer adds your keys to the `live` environment, and your provider joins the next published run ([RUNNER](docs/RUNNER.md)), which makes 10 attempts per probe.
+After merge, a maintainer adds your keys to the `live` environment and to the two workflows ([RUNNER](docs/RUNNER.md#what-a-run-does)), and your provider joins the next published run ([RUNNER](docs/RUNNER.md)), which makes 10 attempts per probe.
 
 **Adapter rules:**
 - **Public API only.** Use your public SDK or REST API, with the SDK version pinned.
