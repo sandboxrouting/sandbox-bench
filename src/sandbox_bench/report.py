@@ -15,7 +15,7 @@ from sandbox_bench import boards, pricing
 from sandbox_bench.adapter import STANDARD_SIZE
 from sandbox_bench.benchmark import ALWAYS_OFFERED, PASS_THRESHOLD, PROBES, WINDOW
 from sandbox_bench.boards import COLUMNS, Board, Column, Failure, ProviderBoard, fmt_s
-from sandbox_bench.schema import SCHEMA_VERSION, ProviderInfo, RunRecord
+from sandbox_bench.schema import SCHEMA_VERSION, Attempt, ProviderInfo, RunRecord
 
 RESULTS_FORMAT = 1
 """Version of the ``results.json`` layout; bumps when a key changes meaning or goes away."""
@@ -280,6 +280,20 @@ def results(board: Board, prices: Prices) -> dict[str, Any]:
 
 
 # ---- sbx check ---------------------------------------------------------------------------------
+def _check_timings(own: list[Attempt]) -> dict[str, list[str]]:
+    """Median timings by the probe row they're shown on: the column's gate probe, or, when the
+    gate didn't run (``--probe``), the first probe that ran in the attempts that were timed."""
+    by_row: dict[str, list[str]] = {}
+    for c in COLUMNS:
+        if not (pts := boards.samples(own, c)):
+            continue
+        ran = [p for p in PROBES if any(p in a.verdicts for a in own if c.metric in a.timings)]
+        row = c.gate if c.gate in ran or not ran else ran[0]
+        median = statistics.median(v for _, v in pts)
+        by_row.setdefault(row, []).append(f"{c.title} {fmt_s(median)}")
+    return by_row
+
+
 def check_table(record: RunRecord) -> str:
     """A compact table for one ``sbx check`` run: raw counts, no 9-of-10 window."""
     out: list[str] = []
@@ -287,6 +301,7 @@ def check_table(record: RunRecord) -> str:
     for info in record.providers:
         own = [a for a in record.attempts if a.provider == info.name]
         rows, failures = [], []
+        timings = _check_timings(own)
         for probe in PROBES:
             verdicts = [(a, a.verdicts[probe]) for a in own if probe in a.verdicts]
             excluded += sum(v.outcome == "excluded" for _, v in verdicts)
@@ -297,13 +312,8 @@ def check_table(record: RunRecord) -> str:
             else:
                 offered = probe in info.offers or probe in ALWAYS_OFFERED
                 outcome = "not run" if offered else "n/a"
-            timings = ", ".join(
-                f"{c.title} {fmt_s(statistics.median(v for _, v in pts))}"
-                for c in COLUMNS
-                if c.gate == probe and (pts := boards.samples(own, c))
-            )
             verified = f"{passed}/{len(counted)}" if counted else "-"
-            rows.append([probe, verified, outcome, timings])
+            rows.append([probe, verified, outcome, ", ".join(timings.get(probe, []))])
             if last := [(a, v) for a, v in counted if v.outcome == "fail"][-1:]:
                 a, v = last[0]
                 f = Failure(record.run_id, a.action, a.index, a.started_at, v.error, v.evidence)
