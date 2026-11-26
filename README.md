@@ -7,7 +7,7 @@
 
 **Does your sandbox really keep your agent's running process when you pause, snapshot or fork it, and how fast?**
 
-sandbox-bench checks every day, with the same probes for every provider. No paid placement. Measured from one machine in us-east. Raw data in git.
+sandbox-bench runs the same probes on every provider. No paid placement. Every run is published, with its raw data in git.
 
 > **Pre-launch.** v0.1 is being built. See the [roadmap](docs/ROADMAP.md).
 
@@ -32,14 +32,14 @@ sandbox-bench checks every day, with the same probes for every provider. No paid
 
 A probe passes when at least 9 of its last 10 attempts succeed. A provider's score is the share of the 11 probes it passes, shown with the count (e.g. 64%, 7 of 11). Every probe weighs the same, and providers rank by that score, with ties going to the faster Start. A probe that is offered but passes less often is named as failing, and one that isn't offered is n/a; both count as zero. A time column shows a number only when the probe behind it passes.
 
-Each daily run makes 5 attempts per probe, so "the last 10" covers about two days. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
+Each run makes 10 attempts per probe, so every published run is a complete result, dated. Each run's full report adds per-column rankings, p90s, sample counts, plan, size and region. The [methodology](docs/METHODOLOGY.md) has the exact clock boundaries.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-a-run-works-dark.svg">
-  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1: once a day a systemd timer on one machine in us-east runs sbx run, and the adapters drive each provider's 2 vCPU / 4 GiB sandboxes through 5 attempts of every probe, shuffled, one operation in flight. 2: the raw run record goes to a separate results repo, append-only. 3: sbx report scores all runs. 4: the leaderboard tables are committed and pushed.">
+  <img src="docs/assets/how-a-run-works-light.svg" alt="How a run works. 1: a maintainer starts the Benchmark run workflow, which runs sbx run, and the adapters drive each provider's 2 vCPU / 4 GiB sandboxes through 10 attempts of every probe, shuffled, one operation in flight. 2: the raw run record goes to a separate results repo, append-only. 3: sbx report scores all runs. 4: the leaderboard tables are committed and pushed.">
 </picture>
 
-*How a daily run reaches the leaderboard. The machine's setup is in [RUNNER](docs/RUNNER.md).*
+*How a run reaches the leaderboard. Details, and the planned daily runs, are in [RUNNER](docs/RUNNER.md).*
 
 ## The probes (v0.1)
 
@@ -75,7 +75,7 @@ uv sync
 uv run sbx check fake                                   # offline: try the harness, no account
 uv run sbx check daytona                                # every probe, with your own key
 uv run sbx check freestyle --probe pause-keeps-memory   # just one
-uv run sbx run --providers daytona,freestyle --out runs # a full run, as the daily job does it
+uv run sbx run --providers daytona,freestyle --out runs # a full run, as published runs do it
 uv run sbx report runs --out board                      # score run records into tables
 ```
 
@@ -85,13 +85,13 @@ Keys come from environment variables only, e.g. `DAYTONA_API_KEY`.
 
 *Real output from a Freestyle run on 2026-11-26.*
 
-Results you produce are yours to compare. The published tables come only from our runner.
+Results you produce are yours to compare. The published tables come only from our runner workflow.
 
 ## Add your provider
 
 1. Copy `src/sandbox_bench/providers/_template.py` to `src/sandbox_bench/providers/<you>.py`. Implement `create`, `exec` and `destroy`, plus whatever pause, snapshot or fork you offer.
 2. Run `sbx check <you>` with your own key, and paste its table into a PR.
-3. After merge, we run your provider daily from our machine, on your free tier or on credits you give the project. It appears on the leaderboard once each probe has 10 attempts.
+3. After merge, your provider joins the next published run, on your free tier or on credits you give the project.
 
 Details are in [CONTRIBUTING](CONTRIBUTING.md#add-your-provider).
 

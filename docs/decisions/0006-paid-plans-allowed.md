@@ -17,4 +17,4 @@ Allow any public plan a new customer can sign up for: a free tier, credits, or p
 
 ## Consequences
 - Results may not hold for a new Daytona account on Tier 1 or 2: `internet` and `egress-block` would fail there. Listed in [METHODOLOGY §9.3](../METHODOLOGY.md#93-external-validity-how-far-the-results-carry).
-- Daily runs cost money on some providers. Payloads and attempt counts stay small (ROADMAP, Risks).
+- Runs cost money on some providers. Payloads stay small and runs are started by hand (ROADMAP, Risks).

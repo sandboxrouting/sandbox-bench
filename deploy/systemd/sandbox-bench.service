@@ -1,5 +1,5 @@
 [Unit]
-Description=sandbox-bench daily run
+Description=sandbox-bench daily run (planned, docs/RUNNER.md)
 Documentation=https://github.com/sandboxrouting/sandbox-bench/blob/main/docs/RUNNER.md
 Wants=network-online.target
 After=network-online.target
@@ -9,8 +9,8 @@ Type=oneshot
 User=sbx
 Group=sbx
 EnvironmentFile=/etc/sandbox-bench/env
-ExecStart=/home/sbx/sandbox-bench/deploy/daily-run.sh
-# A full run is ~11 probes x 5 attempts per provider, with snapshots that can take minutes.
+ExecStart=/home/sbx/sandbox-bench/deploy/publish-run.sh
+# A full run is ~11 probes x 10 attempts per provider, with snapshots that can take minutes.
 TimeoutStartSec=6h
 Nice=5
 # Hardening: the run needs the network and its two checkouts, nothing else.

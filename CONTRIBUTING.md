@@ -87,7 +87,7 @@ The harness is kept under 1,800 lines: everything outside `providers/` and `prob
 
 3. **Open a PR** and paste the table `sbx check` printed.
 
-After merge, your provider joins the next daily run on our machine. It shows up in the published tables once each probe has 10 attempts.
+After merge, your provider joins the next published run ([RUNNER](docs/RUNNER.md)), which makes 10 attempts per probe.
 
 **Adapter rules:**
 - **Public API only.** Use your public SDK or REST API, with the SDK version pinned.

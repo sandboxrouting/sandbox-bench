@@ -13,6 +13,7 @@ One file per decision that shapes what the benchmark measures or how it runs, nu
 | [0007](0007-unknown-prices-stay-unknown.md) | A price the provider doesn't publish is shown as unknown | accepted |
 | [0008](0008-network-probes-use-image-tools.md) | Network probes use tools from the default image | accepted |
 | [0009](0009-throttling-is-the-providers-failure.md) | Throttling is the provider's failure; a plan limit is ours | accepted |
+| [0010](0010-manual-runs-from-one-workflow.md) | Published runs are started by hand, from one workflow | accepted |
 
 ## How to add one
 

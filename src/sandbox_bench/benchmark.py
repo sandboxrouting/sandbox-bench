@@ -46,7 +46,7 @@ ALWAYS_OFFERED: Final[frozenset[str]] = frozenset({"create-exec", "file-roundtri
 """Probes that only use the required operations; every provider is tested on them."""
 
 # ---- scoring -------------------------------------------------------------------------------
-ATTEMPTS_PER_RUN: Final = 5
+ATTEMPTS_PER_RUN: Final = 10
 WINDOW: Final = 10
 """A probe's outcome and a timing column's median use the last ``WINDOW`` attempts."""
 PASS_THRESHOLD: Final = 9

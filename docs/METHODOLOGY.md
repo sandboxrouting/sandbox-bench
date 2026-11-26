@@ -6,9 +6,9 @@ Everything about how sandbox-bench measures, on one page. If this page and the c
 
 - **Sandbox size:** 2 vCPU / 4 GiB RAM. Where a provider has fixed shapes, we use the nearest one at or above this, and each row shows the actual size.
 - **Environment:** the provider's default image and settings. A pre-started pool counts when the provider runs it for everyone at no extra cost; a warm pool billed while idle doesn't. Probes bring their own tools and need only `sh` with the usual core utilities (`head`, `cut`, `sha256sum`), `/proc` and a writable `/dev/shm` inside the sandbox. The network probes also need one of `python3`, `curl`, `wget` or `nc` (see "Pinned details" below). A missing tool fails a probe; it never passes one.
-- **Runner:** one fixed machine in us-east. Each provider uses its region nearest the runner, shown in its row.
+- **Runner:** one GitHub Actions workflow on a GitHub-hosted Linux runner. GitHub doesn't pin its region, so each run records it. Each provider uses its region nearest us-east, shown in its row. A fixed machine in us-east is planned (RUNNER).
 - **Accounts:** any public plan a new customer can sign up for: a free tier, credits, or pay-as-you-go ([ADR-0006](decisions/0006-paid-plans-allowed.md)). Each row shows its plan, and any account tier that changes what a probe sees.
-- **Cadence:** one run per day, with 5 attempts per probe. Providers are interleaved in a shuffled order, with one operation in flight at a time. Each run starts with one uncounted warm-up create per provider.
+- **Cadence:** runs are started by hand by a maintainer, from `main`, with 10 attempts per probe, so each run is a complete, dated result. Every run started is published ([ADR-0010](decisions/0010-manual-runs-from-one-workflow.md)). Daily runs are planned. Providers are interleaved in a shuffled order, with one operation in flight at a time. Each run starts with one uncounted warm-up create per provider.
 
 ## 2. Probes
 
@@ -163,16 +163,17 @@ Every known way these results could mislead, in the four standard categories. Ea
 
 | Threat | What we do | What remains |
 |---|---|---|
-| **One runner region.** | Each provider uses its region nearest us-east, shown in its row. | Results from Europe or Asia may differ, in latency and in which pools are warm. |
+| **The runner's region isn't pinned.** | Each run records its Azure region. Each provider uses its region nearest us-east, shown in its row ([ADR-0010](decisions/0010-manual-runs-from-one-workflow.md)). | Timings can shift between runs when the runner lands in a different region. A fixed us-east machine is planned. Results from Europe or Asia may differ, in latency and in which pools are warm. |
 | **One size, default image, default settings.** | 2 vCPU / 4 GiB, or the nearest shape above, shown in the row. | Larger sandboxes, custom images and tuned settings can behave differently, especially for snapshot, restore and fork. |
 | **One account and plan per provider.** | Any public plan, stated in the row ([ADR-0006](decisions/0006-paid-plans-allowed.md)). | Account tiers change behaviour. Our Daytona account behaves like Tier 3+; on Tier 1/2, `internet` and `egress-block` would fail. |
-| **One operation at a time, short-lived sandboxes.** | Shuffled, sequential, about two days of attempts per window. | No burst or concurrency load, and pauses last seconds, not hours (`pause-1h-resume` is planned for v0.2). |
-| **One time of day.** | The run starts at 06:00 UTC daily. | Providers loaded at other hours may be slower or less reliable than shown. |
+| **One operation at a time, short-lived sandboxes.** | Shuffled and sequential, within one run. | No burst or concurrency load, and pauses last seconds, not hours (`pause-1h-resume` is planned for v0.2). |
+| **Runs happen when a maintainer starts them.** | Every run started is published, with its start time and who started it. | Runs are irregular, so a board can be weeks old, and providers loaded at other hours may be slower or less reliable than shown. |
 
 ### 9.4 Conclusion validity: are the numbers solid enough?
 
 | Threat | What we do | What remains |
 |---|---|---|
+| **A verdict comes from one run.** | All 10 attempts of a run happen within the same hour or two, and each board shows the date of its run. | "Passes 9 of 10" says it worked that day, not that it keeps working. Daily runs would show that over time. |
 | **9 of 10 is a small sample.** | The threshold and window are fixed for everyone and shown with each verdict. | A probe that truly succeeds 90% of the time shows as passing only about 74% of the time; at 95%, about 91%; at 99%, more than 99%. One bad day can flip a verdict. |
 | **Medians of 10 samples are noisy when times vary widely.** | p50 and p90 are shown with n and the date window. | Daytona's snapshot time ranged from 7.6 s to 449 s in testing. With 10 samples, p90 is close to the single slowest value. |
 | **Early results.** | Columns with fewer than 10 samples are shown but not ranked. | Numbers from a single `sbx check` (one attempt per probe) are examples, not results. |

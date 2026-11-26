@@ -376,14 +376,14 @@ def run(P):
         b.append(T(cx, cy + 5.5, n, P, 15, "ink", 600, "middle"))
 
     # Row 1: the measuring loop
-    b.append(T(0, 22, "Once a day, from one machine", P, 16, "faint", 500))
+    b.append(T(0, 22, "Started by a maintainer, from one workflow", P, 16, "faint", 500))
     b.append(card(0, 40, 290, 196, P))
     head(22, 76, "Runner")
-    b.append(T(22, 106, "one fixed VM in us-east", P, 17, "muted"))
-    b.append(T(22, 132, "systemd timer, 06:00 UTC", P, 17, "muted"))
+    b.append(T(22, 106, "GitHub Actions, from main", P, 17, "muted"))
+    b.append(T(22, 132, "started by hand", P, 17, "muted"))
     b.append(card(22, 152, 246, 62, P, "rule", "bg", 6, 1))
     b.append(M(36, 178, "sbx run", P, 16, "ink", 600))
-    b.append(M(36, 200, "5 attempts per probe", P, 14, "muted"))
+    b.append(M(36, 200, "10 attempts per probe", P, 14, "muted"))
 
     b.append(card(400, 40, 280, 196, P))
     head(422, 76, "Adapters")
@@ -460,8 +460,8 @@ def run(P):
     b.append(T(836, y2 + 128, "commit, push", P, 14, "muted", 400, "middle"))
     return svg(
         W, H, "\n".join(b), "How a run works",
-        "Once a day a systemd timer on one machine in us-east runs sbx run: adapters drive each provider's "
-        "sandboxes through 5 attempts of every offered probe. The raw run record is written to a separate "
+        "A maintainer starts the Benchmark run workflow, which runs sbx run: adapters drive each provider's "
+        "sandboxes through 10 attempts of every offered probe. The raw run record is written to a separate "
         "results repo, sbx report scores it, and the leaderboard tables are committed and pushed.",
     )
 
