@@ -265,7 +265,7 @@ def test_non_json_error_body(api: FakeApi, fs: Freestyle) -> None:
         broken.ping()
 
 
-@pytest.mark.parametrize("prefix", ["", "sb", "cc-", "snapvm-", "SBX-"])
+@pytest.mark.parametrize("prefix", ["", "sb", "cc-", "other-", "SBX-"])
 def test_reap_refuses_foreign_prefixes(api: FakeApi, fs: Freestyle, prefix: str) -> None:
     with pytest.raises(ValueError, match="refusing to reap"):
         fs.reap(prefix)
@@ -278,7 +278,7 @@ def test_reap_deletes_only_matching_private_resources(api: FakeApi, fs: Freestyl
     api.vms["vm-other"] = {"id": "vm-other", "slug": "cc-mine", "state": "running"}
     api.vms["vm-noslug"] = {"id": "vm-noslug", "slug": None, "state": "paused"}
     api.snapshots["sh-a"] = {"id": "sh-a", "slug": "sbx-r1-snap", "public": False}
-    api.snapshots["sh-b"] = {"id": "sh-b", "slug": "snapvm-keep", "public": False}
+    api.snapshots["sh-b"] = {"id": "sh-b", "slug": "other-keep", "public": False}
     api.snapshots["sh-c"] = {"id": "sh-c", "slug": "sbx-r1-public", "public": True}
     assert fs.reap("sbx-r1-") == 151
     assert set(api.vms) == {"vm-other", "vm-noslug"}
