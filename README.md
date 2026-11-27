@@ -11,7 +11,7 @@ sandbox-bench runs the same probes on every provider. No paid placement. Every r
 
 ## The leaderboard
 
-*As of `<date>` · runner in us-east · every sandbox 2 vCPU / 4 GiB · illustrative numbers until the first run*
+*As of `<date>` · runner in Azure southcentralus (GitHub-hosted) · every sandbox 2 vCPU / 4 GiB · illustrative numbers until the first run*
 
 | # | Provider | Probes passed | Keeps memory on | Start | Resume | Restore | Fork | $/h running / paused |
 |---|---|---|---|---|---|---|---|---|

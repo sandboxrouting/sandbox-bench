@@ -46,6 +46,7 @@ git -C "$SBX_RESULTS" pull --quiet --ff-only
 out="$SBX_RESULTS/runs"  # `sbx run` adds YYYY/MM/DD/<run_id>.json itself
 mkdir -p "$out"
 
+run_date=$(date -u +%F)  # the date in the record's path, even if the run ends after midnight
 log "running providers: $SBX_PROVIDERS"
 status=0
 (cd "$SBX_HOME" && uv run --frozen --no-dev sbx run --providers "$SBX_PROVIDERS" --out "$out") || status=$?
@@ -63,7 +64,7 @@ git -C "$SBX_RESULTS" add runs board
 if git -C "$SBX_RESULTS" diff --cached --quiet; then
   log "nothing new to commit"
 else
-  msg="run $(date -u +%F) (harness $harness_sha)"
+  msg="run $run_date (harness $harness_sha)"
   if [ -n "$SBX_COMMIT_NOTE" ]; then msg=$(printf '%s\n\n%s' "$msg" "$SBX_COMMIT_NOTE"); fi
   git -C "$SBX_RESULTS" commit --quiet -m "$msg"
   if [ "$SBX_PUSH" = 1 ]; then
