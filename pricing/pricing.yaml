@@ -21,6 +21,21 @@ providers:
       - Storage $0.000108/GiB-h, first 5 GiB free.
       - $200 of free compute with pay-as-you-go.
 
+  e2b:
+    running:
+      usd_per_hour: 0.1656
+      basis: 2 × $0.0504/vCPU-h + 4 × $0.0162/GiB-h ($0.000014/vCPU-s, $0.0000045/GiB-s)
+      source: https://e2b.dev/pricing
+      checked: 2026-11-27
+    paused:
+      usd_per_hour: 0.0
+      basis: no compute is billed while paused, and disk is free
+      source: https://docs.e2b.dev/faq/sandbox-lifetime
+      checked: 2026-11-27
+    notes:
+      - Billed per second for provisioned CPU and RAM; disk is included.
+      - Hobby is free with a one-time $100 credit, 10 concurrent sandboxes and 1 h of continuous runtime; Pro is $150 a month plus usage.
+
   freestyle:
     running:
       usd_per_hour: 0.13224
