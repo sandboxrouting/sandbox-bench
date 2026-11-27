@@ -62,7 +62,7 @@ class Run:
     only: frozenset[str] | None = None
     env: Env = field(default_factory=Env)
     strict: bool = False
-    region: str = "us-east"
+    region: str = "unspecified"
     git_sha: str | None = None
     run_id: str = ""
     log: list[str] = field(default_factory=list)

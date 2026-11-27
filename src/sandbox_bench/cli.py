@@ -52,7 +52,7 @@ def _run(
         attempts=args.attempts,
         seed=args.seed,
         only=frozenset(only) if only else None,
-        region=os.environ.get("SBX_RUNNER_REGION", "us-east"),
+        region=os.environ.get("SBX_RUNNER_REGION", "unspecified"),
         git_sha=git_sha(),
         log=list(log),
     )
