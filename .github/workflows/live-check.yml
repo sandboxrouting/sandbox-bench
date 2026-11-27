@@ -49,6 +49,7 @@ jobs:
           # ones (docs/RUNNER.md). Runs after `uv sync`, so no install step sees keys.
           DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
           DAYTONA_API_URL: ${{ secrets.DAYTONA_API_URL }}
+          E2B_API_KEY: ${{ secrets.E2B_API_KEY }}
           FREESTYLE_API_KEY: ${{ secrets.FREESTYLE_API_KEY }}
         run: python3 scripts/export_provider_secrets.py "$PROVIDERS"
       - name: sbx check

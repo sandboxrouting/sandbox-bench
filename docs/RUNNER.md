@@ -27,10 +27,11 @@ A provider failing its probes is a result, so it never stops the run or the push
 
 **One-time setup:**
 - A `live` environment, with required reviewers, holding:
-  - each provider's keys, named after it: `DAYTONA_API_KEY`, `DAYTONA_API_URL`, `FREESTYLE_API_KEY`;
+  - each provider's keys, named after it: `DAYTONA_API_KEY`, `DAYTONA_API_URL`, `E2B_API_KEY`, `FREESTYLE_API_KEY`;
   - `RESULTS_DEPLOY_KEY`, the private half of a deploy key with write access on the results repo.
 
   For a new provider, add its keys here and one line per key to the "Pass the provider's keys" step in `benchmark.yml` and `live-check.yml`. That step lists keys by name: GitHub flags a workflow that reads all secrets at once (`toJSON(secrets)`) as possibly malicious and won't run it. A run then passes each provider only the keys whose names start with its own (`DAYTONA_…`), via [`scripts/export_provider_secrets.py`](../scripts/export_provider_secrets.py).
+- On E2B, the standard-size template, built once with the account's key: `E2B_API_KEY=... uv run python -m sandbox_bench.providers.e2b build-template` ([ADR-0011](decisions/0011-e2b-standard-size-template.md)). Rebuild it when the `e2b` SDK pin changes.
 
 ## The results repo
 
